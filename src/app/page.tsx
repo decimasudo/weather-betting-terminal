@@ -1,65 +1,172 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Cloud, Droplets, TrendingUp, ArrowRight, Zap, Shield, Activity } from 'lucide-react';
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-200">
+      
+      {/* 1. Navbar */}
+      <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="font-bold text-xl flex items-center gap-2 text-slate-800">
+            <Cloud className="w-6 h-6 text-blue-500" />
+            <span>Weath3rBet</span>
+          </div>
+          <Link href="/dashboard" className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors rounded-lg font-medium text-sm shadow-sm">
+            Launch App
+          </Link>
+        </div>
+      </nav>
+
+      {/* 2. Hero Section */}
+      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
+        {/* Efek Cahaya Latar Belakang (Glow) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-400/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-medium mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            Live Weather Markets Available
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 text-slate-900">
+            Predict the Weather.<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
+              Trade the Outcome.
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Terminal analitik cuaca tingkat lanjut yang terintegrasi langsung dengan Polymarket. Analisis data radar secara real-time dan eksekusi posisimu dalam satu layar tanpa distraksi.
           </p>
+          <div className="flex justify-center gap-4">
+            <Link href="/dashboard" className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg hover:shadow-blue-500/25 rounded-xl font-semibold text-lg flex items-center gap-2 group">
+              Buka Terminal <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Mockup Preview UI */}
+          <div className="mt-20 relative mx-auto w-full max-w-5xl">
+            <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-200/50">
+              <div className="aspect-[16/9] rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 overflow-hidden relative">
+                {/* Ilustrasi Split Screen */}
+                <div className="absolute inset-0 grid grid-cols-2 gap-px bg-slate-200">
+                   <div className="bg-slate-50 p-8 flex flex-col justify-center items-center text-slate-400">
+                      <Cloud className="w-16 h-16 mb-4 text-blue-500" />
+                      <p className="font-medium text-slate-500">Weather Data (Mousam UI)</p>
+                   </div>
+                   <div className="bg-white p-8 flex flex-col justify-center items-center text-slate-400">
+                      <TrendingUp className="w-16 h-16 mb-4 text-blue-600" />
+                      <p className="font-medium text-slate-500">Polymarket Execution</p>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* 3. Features Section */}
+      <section className="py-24 px-6 border-t border-slate-200 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4 text-slate-900">Mengapa Menggunakan Terminal Ini?</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto">Satu layar, dua kekuatan besar. Dirancang khusus untuk efisiensi analisis dan eksekusi pasar.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Feature Card 1 */}
+            <div className="p-8 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-6 text-blue-600">
+                <Activity className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-slate-800">Real-Time Data</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Data cuaca berpresisi tinggi dengan UI bersih ala Mousam Desktop. Pantau probabilitas presipitasi (hujan) tanpa distraksi.
+              </p>
+            </div>
+            {/* Feature Card 2 */}
+            <div className="p-8 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-6 text-emerald-600">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-slate-800">Seamless Execution</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Lihat peluang di Polymarket dan lakukan eksekusi taruhan (Yes/No) di layar yang sama persis di sebelah data radar Anda.
+              </p>
+            </div>
+            {/* Feature Card 3 */}
+            <div className="p-8 rounded-2xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all shadow-sm">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mb-6 text-purple-600">
+                <Shield className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-slate-800">Web3 Ready</h3>
+              <p className="text-slate-500 leading-relaxed">
+                Ditenagai oleh jaringan Polygon dan Gamma API. Tanpa perantara tambahan, langsung terhubung dengan ekosistem Polymarket.
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* 4. How It Works Section */}
+      <section className="py-24 px-6 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-16 text-slate-900">Bagaimana Cara Kerjanya?</h2>
+          <div className="space-y-6">
+            {[
+              { step: '01', title: 'Analyze the Data', desc: 'Cari kota atau lokasi spesifik di terminal kiri. Cek forecast cuaca seperti suhu dan persentase curah hujan menggunakan data radar satelit aktual.' },
+              { step: '02', title: 'Spot Inefficiency', desc: 'Bandingkan probabilitas hujan aktual dengan "harga pasar" (odds) di terminal kanan (Polymarket). Cari celah di mana pasar meremehkan fakta cuaca.' },
+              { step: '03', title: 'Make Your Move', desc: 'Ambil keputusan. Hubungkan wallet Anda dan beli share YES atau NO langsung dari widget terminal tanpa harus berpindah tab browser.' }
+            ].map((item, i) => (
+              <div key={i} className="flex gap-6 md:gap-8 items-start p-8 rounded-2xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
+                <div className="flex-shrink-0 font-mono text-4xl font-extrabold text-blue-100">
+                  {item.step}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2 text-slate-800">{item.title}</h3>
+                  <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Powered By Section */}
+      <section className="py-16 px-6 border-y border-slate-200 bg-white">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-10">Integrasi & Sumber Data</p>
+          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+            <div className="text-2xl font-bold flex items-center gap-2 text-slate-800">
+              <Cloud className="w-6 h-6 text-orange-500" /> Open-Meteo
+            </div>
+            <div className="text-2xl font-bold font-serif italic text-blue-600">Polymarket</div>
+            <div className="text-2xl font-bold tracking-tighter text-slate-900">▲ Next.js</div>
+            <div className="text-xl font-bold text-purple-600 flex items-center gap-2">
+              <div className="w-5 h-5 bg-purple-600 rounded-full"></div> Polygon
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Footer */}
+      <footer className="py-12 px-6 bg-slate-50 text-center border-t border-slate-200">
+        <div className="max-w-7xl mx-auto flex flex-col items-center">
+          <div className="font-bold text-xl mb-6 text-slate-700 flex items-center gap-2">
+            <Cloud className="w-6 h-6 text-blue-500" /> Weath3rBet
+          </div>
+          <p className="text-slate-500 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+            Disclaimer: Aplikasi ini hanyalah antarmuka (interface) agregator data. Kami tidak menyimpan dana atau mengeksekusi taruhan secara sepihak. Segala bentuk transaksi web3 bergantung pada pengguna.
+          </p>
+          <div className="w-24 h-px bg-slate-200 mb-8"></div>
+          <div className="text-slate-400 text-sm">
+            © {new Date().getFullYear()} Weath3rBet Terminal.
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }
