@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Search, Droplets, Wind, Waves, Eye, 
@@ -52,6 +53,13 @@ export default function DashboardTerminal() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Debounce logic untuk Search Input
@@ -81,6 +89,7 @@ export default function DashboardTerminal() {
 
   // Effect 1: Weather only — re-runs when city changes, never touches markets
   useEffect(() => {
+    const loadWeather = async () => {
     const loadWeather = async () => {
       setIsLoadingWeather(true);
       try {
