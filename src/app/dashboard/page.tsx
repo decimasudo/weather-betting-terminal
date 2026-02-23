@@ -142,7 +142,7 @@ export default function DashboardTerminal() {
           {!weather && !isLoadingWeather ? (
             <div className="flex-1 flex items-center justify-center text-slate-400 flex-col gap-3">
               <CloudFog className="w-12 h-12" />
-              <p>Data cuaca tidak ditemukan untuk lokasi ini.</p>
+              <p>Weather data not found for this location.</p>
             </div>
           ) : (
             <div className={`transition-opacity duration-500 ${isLoadingWeather ? 'opacity-50' : 'opacity-100'}`}>
@@ -153,9 +153,9 @@ export default function DashboardTerminal() {
                   <WeatherIcon code={weather?.weatherCode || 0} className="w-48 h-48" />
                 </div>
                 <div className="relative z-10">
-                  <h2 className="text-3xl font-bold text-slate-800 mb-1">{weather?.city || 'Memuat...'}</h2>
+                  <h2 className="text-3xl font-bold text-slate-800 mb-1">{weather?.city || 'Loading...'}</h2>
                   <p className="text-slate-500 mb-8 flex items-center gap-2">
-                    <Clock className="w-4 h-4" /> Aktual
+                    <Clock className="w-4 h-4" /> Current
                   </p>
                   
                   <div className="flex items-end gap-4">
@@ -170,25 +170,25 @@ export default function DashboardTerminal() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                   <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Droplets className="w-4 h-4 text-blue-500" /> Probabilitas Hujan
+                    <Droplets className="w-4 h-4 text-blue-500" /> Rain Probability
                   </span>
                   <span className="text-2xl font-bold text-slate-800">{weather?.precipitationProb || 0}%</span>
                 </div>
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                   <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Wind className="w-4 h-4 text-teal-500" /> Kecepatan Angin
+                    <Wind className="w-4 h-4 text-teal-500" /> Wind Speed
                   </span>
                   <span className="text-2xl font-bold text-slate-800">{weather?.windSpeed || 0} <span className="text-sm text-slate-500">km/h</span></span>
                 </div>
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                   <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Waves className="w-4 h-4 text-cyan-500" /> Kelembapan
+                    <Waves className="w-4 h-4 text-cyan-500" /> Humidity
                   </span>
                   <span className="text-2xl font-bold text-slate-800">{weather?.humidity || 0}%</span>
                 </div>
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                   <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-indigo-500" /> Jarak Pandang
+                    <Eye className="w-4 h-4 text-indigo-500" /> Visibility
                   </span>
                   <span className="text-2xl font-bold text-slate-800">{weather?.visibility || 0} <span className="text-sm text-slate-500">km</span></span>
                 </div>
@@ -197,7 +197,7 @@ export default function DashboardTerminal() {
               {/* Hourly Forecast */}
               <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                 <h3 className="text-slate-800 font-semibold mb-6 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-500" /> Prakiraan Per Jam
+                  <Activity className="w-5 h-5 text-blue-500" /> Hourly Forecast
                 </h3>
                 <div className="flex justify-between items-center overflow-x-auto gap-6 pb-2 custom-scrollbar">
                   {weather?.hourly?.map((item, i) => (
@@ -229,7 +229,7 @@ export default function DashboardTerminal() {
 
           <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
             <p className="text-sm text-slate-600 leading-relaxed">
-              Menampilkan pasar aktif untuk <strong className="text-slate-800">{debouncedQuery}</strong>. Eksekusi posisi berdasarkan data probabilitas di panel kiri.
+              Displaying active markets for <strong className="text-slate-800">{debouncedQuery}</strong>. Execute positions based on probability data in the left panel.
             </p>
           </div>
 
@@ -240,7 +240,7 @@ export default function DashboardTerminal() {
                </div>
             ) : markets.length === 0 ? (
                <div className="text-center py-10 text-slate-500 border border-dashed border-slate-200 rounded-xl">
-                 <p className="text-sm">Tidak ada pasar taruhan aktif yang relevan untuk lokasi ini di Polymarket saat ini.</p>
+                 <p className="text-sm">No relevant active betting markets for this location on Polymarket currently.</p>
                </div>
             ) : (
               markets.map((market) => (

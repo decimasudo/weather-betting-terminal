@@ -3,7 +3,7 @@ import { Cloud, Droplets, TrendingUp, ArrowRight, Zap, Shield, Activity } from '
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-200">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-share-tech selection:bg-blue-200">
       
       {/* 1. Navbar */}
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
@@ -39,11 +39,11 @@ export default function LandingPage() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Terminal analitik cuaca tingkat lanjut yang terintegrasi langsung dengan Polymarket. Analisis data radar secara real-time dan eksekusi posisimu dalam satu layar tanpa distraksi.
+            Advanced weather analytics terminal integrated directly with Polymarket. Analyze real-time radar data and execute your positions in one distraction-free screen.
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/dashboard" className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg hover:shadow-blue-500/25 rounded-xl font-semibold text-lg flex items-center gap-2 group">
-              Buka Terminal <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Open Terminal <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -72,8 +72,8 @@ export default function LandingPage() {
       <section className="py-24 px-6 border-t border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4 text-slate-900">Mengapa Menggunakan Terminal Ini?</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">Satu layar, dua kekuatan besar. Dirancang khusus untuk efisiensi analisis dan eksekusi pasar.</p>
+            <h2 className="text-3xl font-bold mb-4 text-slate-900">Why Use This Terminal?</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto">One screen, two great powers. Designed specifically for analysis efficiency and market execution.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {/* Feature Card 1 */}
@@ -83,7 +83,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-slate-800">Real-Time Data</h3>
               <p className="text-slate-500 leading-relaxed">
-                Data cuaca berpresisi tinggi dengan UI bersih ala Mousam Desktop. Pantau probabilitas presipitasi (hujan) tanpa distraksi.
+                High-precision weather data with clean Mousam Desktop-style UI. Monitor precipitation probability (rain) without distractions.
               </p>
             </div>
             {/* Feature Card 2 */}
@@ -93,7 +93,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-slate-800">Seamless Execution</h3>
               <p className="text-slate-500 leading-relaxed">
-                Lihat peluang di Polymarket dan lakukan eksekusi taruhan (Yes/No) di layar yang sama persis di sebelah data radar Anda.
+                View opportunities on Polymarket and execute bets (Yes/No) on the exact same screen next to your radar data.
               </p>
             </div>
             {/* Feature Card 3 */}
@@ -103,7 +103,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-slate-800">Web3 Ready</h3>
               <p className="text-slate-500 leading-relaxed">
-                Ditenagai oleh jaringan Polygon dan Gamma API. Tanpa perantara tambahan, langsung terhubung dengan ekosistem Polymarket.
+                Powered by Polygon network and Gamma API. No additional intermediaries, directly connected to the Polymarket ecosystem.
               </p>
             </div>
           </div>
@@ -113,12 +113,12 @@ export default function LandingPage() {
       {/* 4. How It Works Section */}
       <section className="py-24 px-6 bg-slate-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-16 text-slate-900">Bagaimana Cara Kerjanya?</h2>
+          <h2 className="text-3xl font-bold text-center mb-16 text-slate-900">How It Works?</h2>
           <div className="space-y-6">
             {[
-              { step: '01', title: 'Analyze the Data', desc: 'Cari kota atau lokasi spesifik di terminal kiri. Cek forecast cuaca seperti suhu dan persentase curah hujan menggunakan data radar satelit aktual.' },
-              { step: '02', title: 'Spot Inefficiency', desc: 'Bandingkan probabilitas hujan aktual dengan "harga pasar" (odds) di terminal kanan (Polymarket). Cari celah di mana pasar meremehkan fakta cuaca.' },
-              { step: '03', title: 'Make Your Move', desc: 'Ambil keputusan. Hubungkan wallet Anda dan beli share YES atau NO langsung dari widget terminal tanpa harus berpindah tab browser.' }
+              { step: '01', title: 'Analyze the Data', desc: 'Search for a specific city or location in the left terminal. Check weather forecast like temperature and precipitation percentage using actual satellite radar data.' },
+              { step: '02', title: 'Spot Inefficiency', desc: 'Compare actual rain probability with "market price" (odds) in the right terminal (Polymarket). Look for gaps where the market underestimates weather facts.' },
+              { step: '03', title: 'Make Your Move', desc: 'Make your decision. Connect your wallet and buy YES or NO shares directly from the terminal widget without switching browser tabs.' }
             ].map((item, i) => (
               <div key={i} className="flex gap-6 md:gap-8 items-start p-8 rounded-2xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
                 <div className="flex-shrink-0 font-mono text-4xl font-extrabold text-blue-100">
@@ -137,7 +137,7 @@ export default function LandingPage() {
       {/* 5. Powered By Section */}
       <section className="py-16 px-6 border-y border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-10">Integrasi & Sumber Data</p>
+          <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-10">Integrations & Data Sources</p>
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
             <div className="text-2xl font-bold flex items-center gap-2 text-slate-800">
               <Cloud className="w-6 h-6 text-orange-500" /> Open-Meteo
@@ -158,7 +158,7 @@ export default function LandingPage() {
             <Cloud className="w-6 h-6 text-blue-500" /> Weath3rBet
           </div>
           <p className="text-slate-500 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
-            Disclaimer: Aplikasi ini hanyalah antarmuka (interface) agregator data. Kami tidak menyimpan dana atau mengeksekusi taruhan secara sepihak. Segala bentuk transaksi web3 bergantung pada pengguna.
+            Disclaimer: This application is merely a data aggregator interface. We do not store funds or execute bets unilaterally. All web3 transactions depend on the user.
           </p>
           <div className="w-24 h-px bg-slate-200 mb-8"></div>
           <div className="text-slate-400 text-sm">
