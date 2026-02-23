@@ -1,136 +1,120 @@
 // src/app/api/polymarket/route.ts
 import { NextResponse } from 'next/server';
+import https from 'https';
 
-<<<<<<< HEAD
-// ─── Module-level in-memory cache ────────────────────────────────────────────
-// Next.js data cache rejects responses > 2MB (Polymarket returns ~2 MB even at
-// limit=100). Using our own cache avoids the warning AND the repeat ECONNRESET
-// that happens when every request hits Polymarket cold.
+// --- In-Memory Cache ---
 let _cache: { data: any[]; ts: number } | null = null;
-const CACHE_TTL = 60_000; // 60 seconds
+const CACHE_TTL = 60_000; // 60 detik
 
-async function fetchWithRetry(url: string, options: RequestInit, retries = 2): Promise<Response> {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const res = await fetch(url, options);
-      if (res.ok) return res;
-      throw new Error(`HTTP ${res.status}`);
-    } catch (err) {
-      if (attempt === retries) throw err;
-      await new Promise(r => setTimeout(r, 400 * (attempt + 1))); // backoff: 400ms, 800ms
-    }
-  }
-  throw new Error('All retries exhausted');
-}
-
-async function getPolymarketEvents(): Promise<any[]> {
-  // Return cached result if still fresh
-  if (_cache && Date.now() - _cache.ts < CACHE_TTL) return _cache.data;
-
-  // limit=30 ≈ 600 KB — well under the 2 MB TCP / cache threshold
-  const res = await fetchWithRetry(
-    `https://gamma-api.polymarket.com/events?active=true&closed=false&limit=30&tag_slug=weather`,
-    {
+// Bypass Next.js Fetch/Undici! Menggunakan native Node.js HTTPS
+function fetchPolymarketNative(url: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const options = {
       headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (compatible; Weath3rBot/1.0)',
       },
-      cache: 'no-store', // we manage caching ourselves
-    }
-  );
+      timeout: 10000 // 10 detik timeout
+    };
 
-  const data = await res.json();
-  _cache = { data: Array.isArray(data) ? data : [], ts: Date.now() };
-  return _cache.data;
-}
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const tab = searchParams.get('tab') || 'temperature';
-
-  try {
-    const allEvents = await getPolymarketEvents();
-
-    // 2. Keywords — Daily_Temp targets short-term/forecast type markets only.
-    //    Exclusions prevent annual climate record questions from leaking in.
-    const tempKeywords = ['temperature', 'temp ', 'degrees', 'celsius', 'fahrenheit', 'coldest day', 'hottest day', 'high temp', 'low temp', 'heat index', 'below zero', 'above average'];
-    const tempExclusions = ['on record', 'rank', 'all-time', 'hottest year', 'warmest year', 'coldest year', 'annual', 'decade', 'century', 'millenium', 'climate change', 'global warm'];
-    const weatherKeywords = ['hurricane', 'storm', 'rainfall', 'snowfall', 'flood', 'typhoon', 'tornado', 'cyclone', 'drought', 'blizzard', 'heatwave', 'heat wave', 'wildfire', 'lightning'];
-
-    // 3. Filter by tab only — show all global markets for each tab.
-    // The left panel provides city-specific forecast for decision-making;
-    // the right panel shows the full global market board.
-    let filteredEvents = allEvents.filter((event: any) => {
-      const textToSearch = ((event.title || '') + ' ' + (event.description || '')).toLowerCase();
-      if (tab === 'temperature') {
-        const hasKeyword = tempKeywords.some(kw => textToSearch.includes(kw));
-        const hasExclusion = tempExclusions.some(ex => textToSearch.includes(ex));
-        return hasKeyword && !hasExclusion;
-      } else {
-        return weatherKeywords.some(kw => textToSearch.includes(kw));
-=======
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const city = (searchParams.get('city') || 'London').toLowerCase();
-  const tab = searchParams.get('tab') || 'temperature';
-
-  try {
-    // 1. KUNCI PENYELESAIAN ECONNRESET: Gunakan Next.js Revalidate
-    // Kita mengambil 100 data event Polymarket HANYA SEKALI setiap 60 detik.
-    // Permintaan ke-2, ke-3, dst dalam menit yang sama tidak akan menembak API Polymarket, melainkan memori lokal.
-    const res = await fetch(
-      `https://gamma-api.polymarket.com/events?active=true&closed=false&limit=100`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          'Connection': 'keep-alive' // Membantu menjaga koneksi agar tidak di-reset TCP
-        },
-        next: { revalidate: 60 } // CACHE SELAMA 60 DETIK
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
+    const req = https.get(url, options, (res) => {
+      // Jika status bukan 200, batalkan
+      if (res.statusCode && (res.statusCode < 200 || res.statusCode >= 300)) {
+        res.resume(); // Bersihkan memori buffer
+        return reject(new Error(`HTTP ${res.statusCode}`));
       }
+
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          resolve(parsed);
+        } catch (e) {
+          reject(new Error('Gagal parse JSON dari Polymarket'));
+        }
+      });
     });
 
-<<<<<<< HEAD
-    // 4. Urutkan dari Volume Tertinggi (Paling Ramai)
-    filteredEvents.sort((a: any, b: any) => (parseFloat(b.volume) || 0) - (parseFloat(a.volume) || 0));
+    req.on('error', (err) => {
+      reject(err);
+    });
 
-    // 5. Format Data untuk Frontend (agar frontend tidak perlu mapping rumit lagi)
-=======
-    if (!res.ok) throw new Error(`API error: ${res.status}`);
-    const allEvents = await res.json();
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Polymarket API Timeout'));
+    });
+  });
+}
 
-    // 2. Keyword Filtering
-    const tempKeywords = ['temp ', 'temperature', 'degree', 'hottest', 'coldest', 'heat', 'warm', 'celsius', 'fahrenheit'];
-    const weatherKeywords = ['weather', 'hurricane', 'storm', 'rain', 'snow', 'flood', 'earthquake', 'disaster', 'climate', 'typhoon'];
+// Fungsi retry yang membungkus pemanggilan HTTPS native
+async function getPolymarketDataWithRetry(url: string, retries = 3): Promise<any[]> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const data = await fetchPolymarketNative(url);
+      return Array.isArray(data) ? data : [];
+    } catch (err: any) {
+      if (attempt === retries) throw err;
+      // Jeda 1 detik, 2 detik, 3 detik sebelum mencoba lagi
+      await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); 
+    }
+  }
+  return [];
+}
 
-    // 3. Filter Data secara LOKAL (Sangat cepat dan tidak memakan API rate limit)
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const city = (searchParams.get('city') || '').toLowerCase();
+  const tab = searchParams.get('tab') || 'temperature';
+
+  try {
+    let allEvents = [];
+
+    // Cek Cache
+    if (_cache && Date.now() - _cache.ts < CACHE_TTL) {
+      allEvents = _cache.data;
+    } else {
+      // Fetch menggunakan fungsi native HTTPS
+      const url = `https://gamma-api.polymarket.com/events?active=true&closed=false&limit=60&tag_slug=weather`;
+      allEvents = await getPolymarketDataWithRetry(url);
+      
+      // Simpan ke cache jika sukses
+      if (allEvents.length > 0) {
+        _cache = { data: allEvents, ts: Date.now() };
+      }
+    }
+
+    // Keyword Filtering Sesuai Tab
+    const tempKeywords = ['temperature', 'temp', 'degree', 'hottest', 'coldest', 'heat', 'warm', 'celsius', 'fahrenheit'];
+    const weatherKeywords = ['snow', 'inches', 'rain', 'weather', 'hurricane', 'storm', 'flood', 'earthquake', 'typhoon', 'precip'];
+
+    // Filter Data secara LOKAL
     let filteredEvents = allEvents.filter((event: any) => {
       const title = (event.title || '').toLowerCase();
       const desc = (event.description || '').toLowerCase();
       const textToSearch = title + " " + desc;
       
-      const isCityMatch = textToSearch.includes(city);
+      // Jika city kosong (Mode GLOBAL), lewati pengecekan kota
+      const isCityMatch = city ? textToSearch.includes(city) : true;
       const keywords = tab === 'temperature' ? tempKeywords : weatherKeywords;
       const isCategoryMatch = keywords.some(kw => textToSearch.includes(kw));
 
       return isCityMatch && isCategoryMatch;
     });
 
+    // Urutkan berdasarkan Volume Tertinggi
     filteredEvents.sort((a: any, b: any) => (parseFloat(b.volume) || 0) - (parseFloat(a.volume) || 0));
 
-    // 4. Formatting untuk Frontend
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
+    // Formatting Data untuk Frontend
     const formattedData = filteredEvents.map((event: any) => {
       const primaryMarket = event.markets && event.markets.length > 0 ? event.markets[0] : null;
       let prices = [0, 0];
       
       if (primaryMarket && primaryMarket.outcomePrices) {
         try { 
-<<<<<<< HEAD
-          // Kadang API Polymarket mereturn string array '["0.65", "0.35"]'
-=======
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
           const parsed = typeof primaryMarket.outcomePrices === 'string' 
             ? JSON.parse(primaryMarket.outcomePrices) 
             : primaryMarket.outcomePrices;
@@ -138,10 +122,6 @@ export async function GET(request: Request) {
         } catch(e){}
       }
 
-<<<<<<< HEAD
-      // Cari URL Gambar yang valid
-=======
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
       const imageUrl = event.image || event.icon || (primaryMarket && primaryMarket.icon) || null;
 
       return {
@@ -154,19 +134,10 @@ export async function GET(request: Request) {
       };
     });
 
-<<<<<<< HEAD
-    // Kembalikan maksimal 20 data agar UI tidak nge-lag
     return NextResponse.json(formattedData.slice(0, 20));
 
   } catch (error) {
-    console.error("Proxy Error:", error);
-    // Jika gagal, kembalikan array kosong agar frontend tidak crash
-=======
-    return NextResponse.json(formattedData);
-
-  } catch (error) {
-    console.error("Proxy Error:", error);
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
+    console.error("Proxy Error API Polymarket Native HTTPS:", error);
     return NextResponse.json([], { status: 200 });
   }
 }

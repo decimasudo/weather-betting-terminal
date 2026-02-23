@@ -57,26 +57,19 @@ export interface PolymarketEvent {
 export async function fetchCitySuggestions(query: string): Promise<string[]> {
   if (!query || query.length < 2) return [];
   try {
-<<<<<<< HEAD
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=10&language=en&format=json`);
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`);
     const data = await res.json();
     if (data.results) {
-      // Deduplicate by city name — keep only the first (most prominent) result per unique name
+      // Deduplicate berdasarkan nama dan negara agar tidak redundan
       const seen = new Set<string>();
       return data.results
-        .map((item: any) => item.name as string)
+        .map((item: any) => `${item.name}, ${item.country_code}`)
         .filter((name: string) => {
           const key = name.toLowerCase();
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
         });
-=======
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`);
-    const data = await res.json();
-    if (data.results) {
-      return data.results.map((item: any) => `${item.name}, ${item.country_code}`);
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
     }
     return [];
   } catch (e) {
@@ -201,8 +194,9 @@ export async function fetchPolymarketEvents(city: string, tab: 'temperature' | '
     const res = await fetch(`/api/polymarket?city=${encodeURIComponent(cityName)}&tab=${tab}`);
     if (!res.ok) return [];
     const data = await res.json();
-<<<<<<< HEAD
-    if (!Array.isArray(data)) return [];
+
+    if (data.error || !Array.isArray(data)) return [];
+
     return data.map((event: any) => ({
       id: event.id,
       title: event.title,
@@ -212,38 +206,6 @@ export async function fetchPolymarketEvents(city: string, tab: 'temperature' | '
       outcomePrices: event.outcomePrices || [0, 0],
       image: event.image || null,
     }));
-=======
-
-    // Jika terjadi error dari proxy atau data bukan array, kembalikan array kosong
-    if (data.error || !Array.isArray(data)) return [];
-
-    return data.map((event: any) => {
-      const primaryMarket = event.markets && event.markets.length > 0 ? event.markets[0] : null;
-      let prices = [0, 0];
-      let outcomes = ["Yes", "No"];
-
-      if (primaryMarket) {
-        try {
-          // Parsing harga dan string outcome
-          if (primaryMarket.outcomePrices) prices = JSON.parse(primaryMarket.outcomePrices);
-          if (primaryMarket.outcomes) outcomes = JSON.parse(primaryMarket.outcomes);
-        } catch (e) {
-          console.warn("Gagal parse data market:", e);
-        }
-      }
-
-      return {
-        id: event.id,
-        title: event.title,
-        volume: event.volume || 0,
-        endDate: new Date(event.endDate).toLocaleDateString("en-US", { day: 'numeric', month: 'short' }),
-        outcomes: outcomes,
-        // Ubah format harga ke cents (misal: 0.82 jadi 82)
-        outcomePrices: prices.map((p: any) => Math.round(Number(p) * 100)),
-        image: event.image || event.icon 
-      };
-    });
->>>>>>> 5476ba3238dd1d5475c6b884cab524d549834f6f
   } catch (error) {
     console.error('Failed to fetch Polymarket events:', error);
     return [];
