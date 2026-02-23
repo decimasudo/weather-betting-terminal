@@ -1,17 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Search, Droplets, Wind, Waves, Eye, Clock, 
-  TrendingUp, Activity, ArrowRight, Sun, Cloud, 
-  CloudRain, CloudLightning, CloudSnow, CloudFog 
+  TrendingUp, ArrowRight, Sun, Cloud, Globe,
+  CloudRain, CloudLightning, CloudSnow, CloudFog, Cpu,
+  ThermometerSun, ChevronDown, MapPin
 } from 'lucide-react';
+import { fetchWeather, fetchCitySuggestions, WeatherData } from '@/lib/api';
+import { InteractiveBackground } from '@/components/interactive-background';
 
-// Import fungsi dari lib/api.ts (Pastikan path ini sesuai dengan struktur folder kamu)
-import { fetchWeather, fetchPolymarketEvents, getCityFromCoordinates, WeatherData, PolymarketEvent } from '@/lib/api';
+const MAJOR_CITIES = [
+  "London", "New York", "Tokyo", "Seoul", "Paris", 
+  "Jakarta", "Atlanta", "Los Angeles", "Dubai", "Sydney", "Moscow"
+];
 
-// Helper: Mengubah WMO Code dari API cuaca menjadi icon Lucide yang elegan
 const WeatherIcon = ({ code, className }: { code: number, className?: string }) => {
   if (code === 0) return <Sun className={className} />;
   if (code >= 1 && code <= 3) return <Cloud className={className} />;
@@ -23,270 +27,268 @@ const WeatherIcon = ({ code, className }: { code: number, className?: string }) 
 };
 
 export default function DashboardTerminal() {
-  const [searchInput, setSearchInput] = useState('Denpasar');
-  const [debouncedQuery, setDebouncedQuery] = useState('Denpasar');
+  // DEFAULT CITY = LONDON
+  const [searchInput, setSearchInput] = useState('London');
+  const [debouncedQuery, setDebouncedQuery] = useState('London');
+  
+  // Tab sekarang HANYA untuk Polymarket (Decoupled)
+  const [activeTab, setActiveTab] = useState<'temperature' | 'events'>('temperature');
+  
+  const [suggestions, setSuggestions] = useState<string[]>(MAJOR_CITIES);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [markets, setMarkets] = useState<PolymarketEvent[]>([]);
+  const [markets, setMarkets] = useState<any[]>([]);
   
   const [isLoadingWeather, setIsLoadingWeather] = useState(true);
   const [isLoadingMarkets, setIsLoadingMarkets] = useState(true);
 
-  // Auto-detect user location on mount
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          const city = await getCityFromCoordinates(latitude, longitude);
-          if (city) {
-            setSearchInput(city.split(" ")[0]); // Ambil kata pertama saja jika terlalu panjang
-            setDebouncedQuery(city.split(" ")[0]);
-          }
-        },
-        (error) => {
-          console.log("Location access denied or error:", error);
-        }
-      );
-    }
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Debounce logic: Menunda API call sampai user selesai mengetik selama 800ms
+  // Debounce Search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchInput.trim() !== '') {
-        setDebouncedQuery(searchInput);
+    const timer = setTimeout(async () => {
+      // Jika kosong, kembalikan ke London secara default agar UI tidak kosong
+      const finalQuery = searchInput.trim() === '' ? 'London' : searchInput.trim();
+      setDebouncedQuery(finalQuery);
+      
+      if (finalQuery.length > 2) {
+         try {
+           const results = await fetchCitySuggestions(finalQuery);
+           setSuggestions(results.length > 0 ? results : MAJOR_CITIES);
+         } catch (e) {
+           setSuggestions(MAJOR_CITIES);
+         }
       }
-    }, 800);
+    }, 600);
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  // Fetch Data Dinamis setiap kali debouncedQuery berubah
+  // EFFECT 1: FETCH WEATHER (Hanya bereaksi pada perubahan kota)
   useEffect(() => {
-    const loadData = async () => {
+    const loadWeather = async () => {
       setIsLoadingWeather(true);
-      setIsLoadingMarkets(true);
-
       try {
-        // Fetch Cuaca
         const weatherData = await fetchWeather(debouncedQuery);
         setWeather(weatherData);
-        setIsLoadingWeather(false);
-
-        // Fetch Polymarket (Gunakan nama kota sebagai keyword pencarian di market)
-        const marketData = await fetchPolymarketEvents(debouncedQuery);
-        setMarkets(marketData);
-        setIsLoadingMarkets(false);
       } catch (error) {
-        console.error("Error loading dashboard data:", error);
+        console.error("Fetch Weather Error", error);
+        setWeather(null);
+      } finally {
         setIsLoadingWeather(false);
+      }
+    };
+    loadWeather();
+  }, [debouncedQuery]);
+
+  // EFFECT 2: FETCH POLYMARKET (Bereaksi pada perubahan kota ATAU tab)
+  useEffect(() => {
+    const loadMarkets = async () => {
+      setIsLoadingMarkets(true);
+      try {
+        const res = await fetch(`/api/polymarket?tab=${activeTab}&city=${encodeURIComponent(debouncedQuery)}`);
+        const marketData = await res.json();
+        setMarkets(Array.isArray(marketData) ? marketData : []);
+      } catch (error) {
+        console.error("Fetch Market Error", error);
+        setMarkets([]);
+      } finally {
         setIsLoadingMarkets(false);
       }
     };
-
-    loadData();
-  }, [debouncedQuery]);
+    loadMarkets();
+  }, [debouncedQuery, activeTab]); // Akan refetch jika kota atau tab berganti
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col h-screen overflow-hidden selection:bg-blue-200">
-      
-      {/* Top Navigation Bar - Light Theme */}
-      <nav className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0 z-10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-slate-500 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-slate-100">
-            <ArrowRight className="w-5 h-5 rotate-180" />
-          </Link>
-          <div className="h-4 w-px bg-slate-200"></div>
-          <span className="font-semibold text-slate-700 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-blue-500" />
-            Terminal Control
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-sm">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-slate-600 font-medium">Polygon Network</span>
+    <div className="min-h-screen font-share-tech flex flex-col h-screen overflow-hidden selection:bg-primary/30 relative text-foreground bg-[#0a0a0a]">
+      <InteractiveBackground />
+
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Top Navbar */}
+        <nav className="h-16 border-b border-primary/20 bg-surface/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-[0_4px_30px_rgba(0,212,255,0.1)]">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-primary/70 hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10">
+              <ArrowRight className="w-5 h-5 rotate-180" />
+            </Link>
+            <div className="h-4 w-px bg-primary/30"></div>
+            <span className="font-bold text-primary flex items-center gap-2 tracking-widest uppercase text-sm text-glow">
+              <Cpu className="w-5 h-5" /> CHANI_CORE
+            </span>
           </div>
-          <button className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-            Connect Wallet
+
+          <button className="px-5 py-2 border border-primary text-primary hover:bg-primary hover:text-background text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(0,212,255,0.2)]">
+            Connect_Wallet
           </button>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Main Terminal Area */}
-      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        
-        {/* ========================================= */}
-        {/* LEFT PANEL: MOUSAM WEATHER UI (DATA TIER) */}
-        {/* ========================================= */}
-        <section className="flex-1 bg-slate-50 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
+        <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
           
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input 
-              type="text" 
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
-              placeholder="Search city for weather analysis..."
-            />
-            {isLoadingWeather && (
-               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-               </div>
-            )}
-          </div>
-
-          {!weather && !isLoadingWeather ? (
-            <div className="flex-1 flex items-center justify-center text-slate-400 flex-col gap-3">
-              <CloudFog className="w-12 h-12" />
-              <p>Weather data not found for this location.</p>
-            </div>
-          ) : (
-            <div className={`transition-opacity duration-500 ${isLoadingWeather ? 'opacity-50' : 'opacity-100'}`}>
+          {/* LEFT PANEL: WEATHER DATA (STABLE, NOT AFFECTED BY TAB) */}
+          <section className="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 border-r border-primary/20 bg-background/40 backdrop-blur-sm">
+            
+            {/* SEARCH BAR WIDGET */}
+            <div className="relative max-w-2xl z-50 w-full" ref={dropdownRef}>
+              <div className="relative">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 w-5 h-5" />
+                <input 
+                  type="text" 
+                  value={searchInput} 
+                  onChange={(e) => {
+                    setSearchInput(e.target.value);
+                    setIsDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  className="w-full bg-surface/80 backdrop-blur-md border border-primary/40 text-white placeholder:text-primary/30 focus:outline-none focus:border-primary focus:shadow-[0_0_20px_rgba(0,212,255,0.4)] py-4 pl-12 pr-12 transition-all uppercase tracking-widest font-mono text-sm rounded-xl"
+                  placeholder="SEARCH CITY (e.g. MOSCOW)..."
+                />
+                <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 text-primary/60 w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </div>
               
-              {/* Current Weather Widget (Clean Adwaita Style) */}
-              <div className="bg-gradient-to-br from-white to-blue-50/50 border border-slate-200 rounded-3xl p-8 shadow-sm relative overflow-hidden mb-6">
-                <div className="absolute top-8 right-8 text-blue-100 pointer-events-none">
-                  <WeatherIcon code={weather?.weatherCode || 0} className="w-48 h-48" />
+              {isDropdownOpen && (
+                <div className="absolute top-full left-0 w-full mt-2 bg-surface/95 backdrop-blur-xl border border-primary/40 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                  {suggestions.map((city, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setSearchInput(city);
+                        setDebouncedQuery(city);
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-5 py-3 hover:bg-primary/20 text-white font-mono uppercase tracking-widest text-sm border-b border-primary/10 last:border-0 transition-colors flex items-center gap-3"
+                    >
+                      <Search className="w-4 h-4 text-primary/50" /> {city}
+                    </button>
+                  ))}
                 </div>
-                <div className="relative z-10">
-                  <h2 className="text-3xl font-bold text-slate-800 mb-1">{weather?.city || 'Loading...'}</h2>
-                  <p className="text-slate-500 mb-8 flex items-center gap-2">
-                    <Clock className="w-4 h-4" /> Current
-                  </p>
-                  
-                  <div className="flex items-end gap-4">
-                    <span className="text-7xl font-bold tracking-tighter text-slate-800">{weather?.temp || 0}°</span>
-                    <span className="text-2xl text-slate-500 font-medium mb-2">C</span>
+              )}
+            </div>
+
+            {/* WEATHER DATA RENDER */}
+            {isLoadingWeather ? (
+              <div className="flex-1 flex items-center justify-center border border-dashed border-primary/20 rounded-2xl bg-surface/20">
+                 <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : weather ? (
+              <div className="animate-in fade-in duration-500 flex flex-col gap-6">
+                <div className="backdrop-blur-md border border-primary/30 bg-surface/60 p-8 relative overflow-hidden rounded-2xl shadow-[0_0_20px_rgba(0,212,255,0.05)]">
+                  <div className="absolute top-8 right-8 pointer-events-none text-primary/10">
+                    <WeatherIcon code={weather.weatherCode || 0} className="w-48 h-48" />
                   </div>
-                  <p className="text-xl text-blue-600 font-semibold mt-2">{weather?.description || '...'}</p>
+                  <div className="relative z-10">
+                    <h2 className="text-3xl font-bold text-white mb-1 tracking-widest uppercase">{weather.city}</h2>
+                    <p className="text-primary/70 mb-8 flex items-center gap-2 text-xs tracking-widest font-mono">
+                      <Clock className="w-4 h-4" /> SYS.TIME: CURRENT
+                    </p>
+                    <div className="flex items-end gap-4">
+                      <span className="text-7xl font-bold tracking-tighter text-primary drop-shadow-[0_0_15px_rgba(0,212,255,0.4)]">
+                        {weather.temp || 0}°
+                      </span>
+                      <span className="text-2xl text-primary/50 font-medium mb-2">C</span>
+                    </div>
+                    <p className="text-xl text-white font-semibold mt-2 uppercase tracking-widest">{weather.description}</p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Essential Data Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Droplets className="w-4 h-4 text-blue-500" /> Rain Probability
-                  </span>
-                  <span className="text-2xl font-bold text-slate-800">{weather?.precipitationProb || 0}%</span>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Wind className="w-4 h-4 text-teal-500" /> Wind Speed
-                  </span>
-                  <span className="text-2xl font-bold text-slate-800">{weather?.windSpeed || 0} <span className="text-sm text-slate-500">km/h</span></span>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Waves className="w-4 h-4 text-cyan-500" /> Humidity
-                  </span>
-                  <span className="text-2xl font-bold text-slate-800">{weather?.humidity || 0}%</span>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                  <span className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-indigo-500" /> Visibility
-                  </span>
-                  <span className="text-2xl font-bold text-slate-800">{weather?.visibility || 0} <span className="text-sm text-slate-500">km</span></span>
-                </div>
-              </div>
-
-              {/* Hourly Forecast */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <h3 className="text-slate-800 font-semibold mb-6 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-500" /> Hourly Forecast
-                </h3>
-                <div className="flex justify-between items-center overflow-x-auto gap-6 pb-2 custom-scrollbar">
-                  {weather?.hourly?.map((item, i) => (
-                    <div key={i} className="flex flex-col items-center gap-4 min-w-[60px]">
-                      <span className="text-sm font-medium text-slate-500">{item.time}</span>
-                      {/* Mapping back icon string from API to Lucide, or use WMO code directly if API updated */}
-                      <WeatherIcon code={0} className="w-6 h-6 text-slate-700" /> 
-                      <span className="font-bold text-slate-800 text-lg">{item.temp}°</span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { icon: Droplets, label: 'PRECIP', val: `${weather.precipitationProb || 0}%` },
+                    { icon: Wind, label: 'WIND', val: `${weather.windSpeed || 0} km/h` },
+                    { icon: Waves, label: 'HUMIDITY', val: `${weather.humidity || 0}%` },
+                    { icon: Eye, label: 'VISIBILITY', val: `${weather.visibility || 0} km` }
+                  ].map((item, i) => (
+                    <div key={i} className="bg-surface/60 backdrop-blur-sm border border-primary/20 p-5 rounded-xl">
+                      <span className="text-xs tracking-widest font-medium mb-3 flex items-center gap-2 text-primary/60">
+                        <item.icon className="w-4 h-4" /> {item.label}
+                      </span>
+                      <span className="text-xl font-bold text-white font-mono">{item.val}</span>
                     </div>
                   ))}
                 </div>
               </div>
+            ) : null}
+          </section>
 
+          {/* RIGHT PANEL: POLYMARKET MARKETS (DYNAMIC TABS) */}
+          <section className="w-full lg:w-[450px] bg-surface/80 backdrop-blur-xl p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.4)] border-l border-primary/30">
+            
+            <div className="flex flex-col gap-4 pb-4 border-b border-primary/30">
+              <h2 className="text-sm font-bold text-white flex items-center gap-2 tracking-widest uppercase">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                {debouncedQuery} MARKETS
+                {isLoadingMarkets && <span className="ml-auto w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>}
+              </h2>
+              
+              {/* TAB CONTROLS DI DALAM PANEL KANAN */}
+              <div className="flex bg-background/50 border border-primary/30 rounded-lg p-1 gap-1">
+                <button 
+                  onClick={() => setActiveTab('temperature')}
+                  className={`flex-1 py-2 text-xs font-bold tracking-widest uppercase rounded flex items-center justify-center gap-2 transition-all ${activeTab === 'temperature' ? 'bg-primary/20 text-primary shadow-[0_0_10px_rgba(0,212,255,0.3)]' : 'text-primary/50 hover:text-primary'}`}
+                >
+                  <ThermometerSun className="w-4 h-4" /> Temp
+                </button>
+                <button 
+                  onClick={() => setActiveTab('events')}
+                  className={`flex-1 py-2 text-xs font-bold tracking-widest uppercase rounded flex items-center justify-center gap-2 transition-all ${activeTab === 'events' ? 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.3)] border border-indigo-500/30' : 'text-primary/50 hover:text-primary'}`}
+                >
+                  <CloudLightning className="w-4 h-4" /> Weather
+                </button>
+              </div>
             </div>
-          )}
-        </section>
 
-        {/* ========================================= */}
-        {/* RIGHT PANEL: POLYMARKET UI (EXECUTION) */}
-        {/* ========================================= */}
-        <section className="w-full lg:w-[480px] bg-white border-l border-slate-200 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 shadow-[-4px_0_24px_rgba(0,0,0,0.02)]">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              Market Execution
-            </h2>
-            <span className="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">Live</span>
-          </div>
+            <div className="space-y-4">
+              {!isLoadingMarkets && markets.length === 0 ? (
+                 <div className="text-center py-12 text-primary/40 border border-dashed border-primary/20 font-mono text-xs tracking-widest rounded-xl bg-black/20">
+                   NO {activeTab.toUpperCase()} MARKETS FOUND<br/>FOR {debouncedQuery.toUpperCase()}
+                 </div>
+              ) : (
+                markets.map((market) => (
+                  <div key={market.id} className="bg-black/60 border border-primary/20 hover:border-primary/60 transition-colors shadow-[0_0_15px_rgba(0,212,255,0.05)] rounded-xl overflow-hidden group">
+                    <div className="flex items-start p-4 gap-4">
+                      <div className="w-16 h-16 shrink-0 rounded-lg bg-surface border border-primary/30 overflow-hidden flex items-center justify-center relative">
+                        {market.image ? (
+                          <img src={market.image} alt="market" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                        ) : (
+                          <Globe className="w-6 h-6 text-primary/30" />
+                        )}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h3 className="font-bold text-white text-[13px] leading-snug mb-2 font-sans">{market.title}</h3>
+                        <div className="flex items-center gap-3 text-[9px] font-mono tracking-widest">
+                          <span className="text-primary/80">VOL: ${(market.volume / 1000).toFixed(1)}K</span>
+                          <span className="text-primary/40">•</span>
+                          <span className="text-primary/80">EXP: {market.endDate}</span>
+                        </div>
+                      </div>
+                    </div>
 
-          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Displaying active markets for <strong className="text-slate-800">{debouncedQuery}</strong>. Execute positions based on probability data in the left panel.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {isLoadingMarkets ? (
-               <div className="flex justify-center py-10">
-                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-               </div>
-            ) : markets.length === 0 ? (
-               <div className="text-center py-10 text-slate-500 border border-dashed border-slate-200 rounded-xl">
-                 <p className="text-sm">No relevant active betting markets for this location on Polymarket currently.</p>
-               </div>
-            ) : (
-              markets.map((market) => (
-                <div key={market.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-blue-300 transition-colors shadow-sm">
-                  <h3 className="font-semibold text-slate-800 text-[15px] leading-snug mb-4">{market.title}</h3>
-                  
-                  <div className="flex items-center justify-between text-xs mb-4 font-medium">
-                    <span className="text-slate-500 bg-slate-100 px-2 py-1 rounded">Vol: ${(market.volume / 1000).toFixed(1)}k</span>
-                    <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded">Ends: {market.endDate}</span>
+                    <div className="grid grid-cols-2 gap-px bg-primary/20 border-t border-primary/20">
+                      <button className="flex justify-between items-center px-4 py-3 bg-surface/80 hover:bg-primary/20 transition-all">
+                        <span className="font-bold text-cyan-400 uppercase tracking-widest text-xs">Yes</span>
+                        <span className="font-mono text-white font-bold">{market.outcomePrices[0] || 0}¢</span>
+                      </button>
+                      <button className="flex justify-between items-center px-4 py-3 bg-surface/80 hover:bg-red-500/20 transition-all">
+                        <span className="font-bold text-red-400 uppercase tracking-widest text-xs">No</span>
+                        <span className="font-mono text-white font-bold">{market.outcomePrices[1] || 0}¢</span>
+                      </button>
+                    </div>
                   </div>
-                  
-                  {/* Odds Buttons */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <button className="flex justify-between items-center px-4 py-3 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl transition-all group">
-                      <span className="font-bold text-blue-600">Yes</span>
-                      <span className="font-mono font-medium text-slate-700">{market.outcomePrices[0] || 0}¢</span>
-                    </button>
-                    <button className="flex justify-between items-center px-4 py-3 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-300 rounded-xl transition-all group">
-                      <span className="font-bold text-red-500">No</span>
-                      <span className="font-mono font-medium text-slate-700">{market.outcomePrices[1] || 0}¢</span>
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-      </main>
-
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-      `}} />
+                ))
+              )}
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }

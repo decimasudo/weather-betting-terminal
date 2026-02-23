@@ -20,6 +20,21 @@ export interface PolymarketEvent {
   endDate: string;
   outcomes: string[];
   outcomePrices: number[];
+  image?: string;
+}
+
+export async function fetchCitySuggestions(query: string): Promise<string[]> {
+  if (!query || query.length < 2) return [];
+  try {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`);
+    const data = await res.json();
+    if (data.results) {
+      return data.results.map((item: any) => `${item.name}, ${item.country_code}`);
+    }
+    return [];
+  } catch (e) {
+    return [];
+  }
 }
 
 export async function getCityFromCoordinates(lat: number, lon: number): Promise<string | null> {
@@ -122,10 +137,11 @@ export async function fetchPolymarketEvents(keyword: string): Promise<Polymarket
         id: event.id,
         title: event.title,
         volume: event.volume || 0,
-        endDate: new Date(event.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+        endDate: new Date(event.endDate).toLocaleDateString("en-US", { day: 'numeric', month: 'short' }),
         outcomes: outcomes,
         // Ubah format harga ke cents (misal: 0.82 jadi 82)
-        outcomePrices: prices.map((p: any) => Math.round(Number(p) * 100)), 
+        outcomePrices: prices.map((p: any) => Math.round(Number(p) * 100)),
+        image: event.image || event.icon 
       };
     });
   } catch (error) {
