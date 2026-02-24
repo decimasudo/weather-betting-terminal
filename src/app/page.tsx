@@ -165,7 +165,7 @@ export default function LandingPage() {
                   {/* Kiri: CHANI Oracle */}
                   <div className="flex-1 bg-black/80 relative p-6 flex flex-col justify-center items-center text-slate-400 overflow-hidden group border-r border-cyan-900/50">
                     <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-700">
-                      <Image src="/chani-bg.jpg" alt="CHANI AI" fill className="object-cover filter contrast-125" />
+                      <Image src="/char.jpeg" alt="CHANI AI" fill className="object-cover filter contrast-125" />
                       {/* Inner scanline */}
                       <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.1)_2px,transparent_2px)] bg-[size:100%_4px] pointer-events-none"></div>
                     </div>

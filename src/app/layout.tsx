@@ -13,6 +13,9 @@ const shareTechMono = Share_Tech_Mono({
 export const metadata: Metadata = {
   title: "Weath3rBet | CHANI Terminal",
   description: "Climate Intelligence AI - Weather Betting Terminal",
+  icons: {
+    icon: "/char.jpeg",
+  },
 };
 
 export default function RootLayout({

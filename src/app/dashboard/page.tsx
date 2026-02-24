@@ -33,6 +33,17 @@ const WeatherIcon = ({ code, className }: { code: number, className?: string }) 
   return <Cloud className={className} />;
 };
 
+// Function to parse simple markdown **bold** syntax
+const parseMarkdown = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
 export default function DashboardTerminal() {
   const [activeTab, setActiveTab] = useState<'temperature' | 'events'>('temperature');
   
@@ -159,7 +170,7 @@ export default function DashboardTerminal() {
     setChatMessages([
       {
         role: 'assistant',
-        content: `[NODE TERHUBUNG]\nPasar: **${market.title}**\n\nSaya CHANI. Data satelit dan probabilitas event (YES: ${market.outcomePrices[0]}¢, NO: ${market.outcomePrices[1]}¢) telah termuat di memori neural saya. Apa yang ingin Anda analisis dari anomali ini?`
+        content: `[NODE CONNECTED]\nMarket: **${market.title}**\n\nI am CHANI. Satellite data and event probabilities (YES: ${market.outcomePrices[0]}¢, NO: ${market.outcomePrices[1]}¢) have been loaded into my neural memory. What would you like to analyze from this anomaly?`
       }
     ]);
   };
@@ -535,14 +546,14 @@ export default function DashboardTerminal() {
                       ? 'bg-cyan-900/40 text-cyan-100 border border-cyan-500/30 rounded-l-xl rounded-tr-xl' 
                       : 'bg-pink-900/20 text-pink-100 border border-pink-500/30 rounded-r-xl rounded-tl-xl shadow-[0_0_10px_rgba(236,72,153,0.1)]'
                     }`}>
-                      {msg.content}
+                      {parseMarkdown(msg.content)}
                     </div>
                   </div>
                 ))}
                 {isChatLoading && (
                   <div className="flex justify-start">
                     <div className="max-w-[85%] p-3 text-sm font-mono bg-pink-900/20 text-pink-400 border border-pink-500/30 rounded-r-xl rounded-tl-xl flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" /> MENGANALISIS...
+                      <Loader2 className="w-4 h-4 animate-spin" /> ANALYZING...
                     </div>
                   </div>
                 )}
@@ -551,6 +562,29 @@ export default function DashboardTerminal() {
 
               {/* Input Area */}
               <div className="p-4 border-t border-pink-500/30 bg-black/80 shrink-0">
+                {/* Suggested Questions */}
+                <div className="mb-3">
+                  <div className="text-[10px] text-cyan-400/70 font-mono mb-2 tracking-widest uppercase">QUICK QUERIES</div>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "What's the probability analysis?",
+                      "Should I bet YES or NO?",
+                      "Market sentiment overview",
+                      "Risk assessment",
+                      "Weather anomaly detection"
+                    ].map((suggestion, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setChatInput(suggestion)}
+                        disabled={isChatLoading}
+                        className="px-2 py-1 text-[9px] bg-cyan-950/30 hover:bg-cyan-900/50 border border-cyan-500/30 hover:border-cyan-400/50 text-cyan-300 hover:text-cyan-200 rounded font-mono transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <form 
                   onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
                   className="relative flex items-center"
@@ -560,7 +594,7 @@ export default function DashboardTerminal() {
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     disabled={isChatLoading}
-                    placeholder="Tanya CHANI soal event ini..."
+                    placeholder="Ask CHANI about this event..."
                     className="w-full bg-black border border-cyan-900/60 text-cyan-100 focus:outline-none focus:border-pink-500 focus:shadow-[0_0_15px_rgba(236,72,153,0.3)] py-3 pl-4 pr-12 rounded-lg font-mono text-xs transition-all disabled:opacity-50"
                   />
                   <button 

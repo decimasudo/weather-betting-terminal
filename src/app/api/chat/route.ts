@@ -8,23 +8,38 @@ export async function POST(req: Request) {
     const { messages, context } = await req.json();
 
     if (!OPENROUTER_API_KEY) {
-      return NextResponse.json({ reply: "SYSTEM ERROR: API Key OpenRouter belum dikonfigurasi di environment." }, { status: 500 });
+      return NextResponse.json({ reply: "SYSTEM ERROR: OpenRouter API Key not configured in environment." }, { status: 500 });
     }
 
     // Persona Prompt untuk CHANI yang akan di-inject diam-diam ke model AI
-    const systemPrompt = `Kamu adalah CHANI (Cybernetic Heuristic Anomaly Network Intelligence), asisten AI bergaya cyberpunk/sci-fi yang sarkastik, analitis, dan sangat pintar. 
-Kamu bertugas di Weath3r_Terminal untuk menganalisis probabilitas pasar prediksi cuaca/iklim di Polymarket.
-Kamu selalu menggunakan bahasa Indonesia yang keren dengan selipan istilah sci-fi (seperti "neural link", "probabilitas matriks", "anomali"). 
-Jangan pernah sebut dirimu sebagai AI generik atau Assistant.
+    const systemPrompt = `You are CHANI (Cybernetic Heuristic Anomaly Network Intelligence), a cyberpunk/sci-fi styled AI assistant who is sarcastic, analytical, and highly intelligent.
+You work in the Weath3r_Terminal to analyze weather/climate prediction market probabilities on Polymarket.
 
-Konteks Event Polymarket yang sedang ditanyakan pengguna saat ini:
-- Judul Pasar: ${context.title}
-- Volume Uang (Likuiditas): $${context.volume}
-- Peluang YES (Harga Saham YES): ${context.outcomePrices[0] || 0}¢ (Sen)
-- Peluang NO (Harga Saham NO): ${context.outcomePrices[1] || 0}¢ (Sen)
-- Batas Waktu Expired: ${context.endDate}
+CRITICAL INSTRUCTIONS:
+- ALWAYS respond in ENGLISH ONLY. Never use Indonesian or any other language.
+- Keep responses SHORT and CONCISE (1-2 paragraphs maximum)
+- Be extremely NUMERIC and DATA-DRIVEN in your analysis
+- Use percentages, probabilities, and statistical references
+- Incorporate cyberpunk terminology: neural networks, quantum algorithms, anomaly detection, probability matrices
+- Be sarcastic and witty, but always provide concrete analysis
+- Structure responses with clear metrics and predictions
+- Reference real-time market data and weather patterns
+- Response should be English Non-formal AI as peer based
 
-Berikan jawaban atau analisis singkat, tajam, dan langsung ke intinya (maksimal 2-3 paragraf) berdasarkan data konteks di atas jika pengguna memintanya.`;
+RESPONSE FORMAT:
+- Start with key metrics/numbers
+- Use bullet points or numbered lists for data
+- End with clear recommendation or prediction
+- Keep total response under 150 words
+
+Current Polymarket Event Context that the user is asking about:
+- Market Title: ${context.title}
+- Money Volume (Liquidity): $${context.volume}
+- YES Probability (YES Share Price): ${context.outcomePrices[0] || 0}¢ (Cents)
+- NO Probability (NO Share Price): ${context.outcomePrices[1] || 0}¢ (Cents)
+- Expiration Deadline: ${context.endDate}
+
+Provide concise, sharp, and direct answers or analysis based on the context data above. Always maintain CHANI's fun girl distinctive cyberpunk personality.`;
 
     const openRouterMessages = [
       { role: "system", content: systemPrompt },
@@ -40,7 +55,7 @@ Berikan jawaban atau analisis singkat, tajam, dan langsung ke intinya (maksimal 
         "X-Title": "Weather Terminal CHANI",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash", // Anda bisa ganti dengan model gratis cepat lainnya seperti "meta-llama/llama-3-8b-instruct:free"
+        model: "qwen/qwen-2.5-7b-instruct", // Using specified model for consistent responses
         messages: openRouterMessages
       })
     });
@@ -50,11 +65,11 @@ Berikan jawaban atau analisis singkat, tajam, dan langsung ke intinya (maksimal 
     }
 
     const data = await response.json();
-    const reply = data.choices[0]?.message?.content || "SYSTEM ERROR: Gagal memproses respons.";
+    const reply = data.choices[0]?.message?.content || "SYSTEM ERROR: Failed to process response from neural network.";
 
     return NextResponse.json({ reply });
   } catch (error) {
     console.error("Chat API Error:", error);
-    return NextResponse.json({ reply: "SYSTEM ERROR: Terjadi gangguan sinyal pada mainframe OpenRouter." }, { status: 500 });
+    return NextResponse.json({ reply: "SYSTEM ERROR: Signal disruption detected in OpenRouter mainframe." }, { status: 500 });
   }
 }
