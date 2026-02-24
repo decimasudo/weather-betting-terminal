@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Search, Droplets, Wind, Waves, Eye, 
   TrendingUp, ArrowRight, Sun, Cloud, 
@@ -146,38 +147,39 @@ export default function DashboardTerminal() {
   };
 
   return (
-    <div className="min-h-screen font-share-tech flex flex-col h-screen overflow-hidden selection:bg-primary/30 relative text-foreground">
+    <div className="min-h-screen font-share-tech flex flex-col h-screen overflow-hidden selection:bg-pink-500/30 relative text-foreground bg-black">
       <InteractiveBackground />
 
       <div className="relative z-10 flex flex-col h-full">
-        <nav className="h-16 border-b border-primary/20 bg-surface/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-[0_4px_30px_rgba(0,212,255,0.1)]">
+        {/* NAVBAR */}
+        <nav className="h-16 border-b border-cyan-900/60 bg-black/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-[0_4px_20px_rgba(34,211,238,0.1)]">
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-primary/70 hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10">
+            <Link href="/" className="text-cyan-600 hover:text-pink-400 transition-colors p-2 rounded-lg hover:bg-pink-500/10">
               <ArrowRight className="w-5 h-5 rotate-180" />
             </Link>
-            <div className="h-4 w-px bg-primary/30"></div>
-            <span className="font-bold text-primary flex items-center gap-2 tracking-widest uppercase text-sm text-glow">
-              <Cpu className="w-5 h-5" /> CHANI_CORE_TERMINAL
+            <div className="h-4 w-px bg-cyan-900"></div>
+            <span className="font-bold text-cyan-400 flex items-center gap-2 tracking-widest uppercase text-sm drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
+              <Cpu className="w-5 h-5 text-pink-500 drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]" /> CHANI_CORE_TERMINAL
             </span>
           </div>
           
-          <div className="hidden lg:flex bg-background/50 border border-primary/30 rounded-lg p-1 gap-1">
+          <div className="hidden lg:flex bg-black/50 border border-cyan-900/50 rounded-lg p-1 gap-1">
             <button 
               onClick={() => setActiveTab('temperature')}
-              className={`px-6 py-1.5 text-xs font-bold tracking-widest uppercase rounded flex items-center gap-2 transition-all ${activeTab === 'temperature' ? 'bg-primary/20 text-primary shadow-[0_0_10px_rgba(0,212,255,0.3)]' : 'text-primary/50 hover:text-primary hover:bg-primary/10'}`}
+              className={`px-6 py-1.5 text-xs font-bold tracking-widest uppercase rounded flex items-center gap-2 transition-all duration-300 ${activeTab === 'temperature' ? 'bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)] border border-cyan-500/50' : 'text-cyan-700 hover:text-cyan-400 hover:bg-cyan-900/30 border border-transparent'}`}
             >
               <ThermometerSun className="w-4 h-4" /> Daily_Temp
             </button>
             <button 
               onClick={() => setActiveTab('events')}
-              className={`px-6 py-1.5 text-xs font-bold tracking-widest uppercase rounded flex items-center gap-2 transition-all ${activeTab === 'events' ? 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.3)] border border-indigo-500/30' : 'text-primary/50 hover:text-primary hover:bg-primary/10'}`}
+              className={`px-6 py-1.5 text-xs font-bold tracking-widest uppercase rounded flex items-center gap-2 transition-all duration-300 ${activeTab === 'events' ? 'bg-pink-500/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.3)] border border-pink-500/50' : 'text-cyan-700 hover:text-pink-400 hover:bg-pink-900/30 border border-transparent'}`}
             >
               <CloudLightning className="w-4 h-4" /> Weather_Events
             </button>
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="px-5 py-2 bg-transparent border border-primary text-primary hover:bg-primary hover:text-background text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(0,212,255,0.2)] hover:shadow-[0_0_20px_rgba(0,212,255,0.6)]">
+            <button className="px-5 py-2 bg-transparent border border-cyan-500 text-cyan-400 hover:bg-cyan-400 hover:text-black text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_20px_rgba(34,211,238,0.6)] rounded-sm">
               Connect_Wallet
             </button>
           </div>
@@ -186,46 +188,64 @@ export default function DashboardTerminal() {
         <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
           
           {/* LEFT PANEL: GLOBAL WATCHLIST */}
-          <section className="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 border-r border-primary/20 bg-background/40 backdrop-blur-sm">
+          <section className="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 border-r border-cyan-900/50 bg-black/40 backdrop-blur-sm">
             
             {/* AGENT IDENTITY WIDGET */}
-            <div className="flex items-center justify-between p-4 border border-primary/30 bg-surface/60 rounded-xl relative overflow-hidden group shrink-0">
-               <div className="absolute inset-0 bg-grid-mecha opacity-10 pointer-events-none" />
+            <div className="flex items-center justify-between p-4 border border-cyan-900/60 bg-black/80 rounded-xl relative overflow-hidden group shrink-0 shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+               <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20 pointer-events-none" />
                <div className="absolute -inset-px rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                 style={{ background: 'linear-gradient(120deg, transparent, rgba(0,212,255,0.06), transparent)' }} />
+                 style={{ background: 'linear-gradient(120deg, transparent, rgba(236,72,153,0.05), transparent)' }} />
                
                <div className="flex items-center gap-4 relative z-10">
-                  <div className="relative shrink-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full border-2 border-primary overflow-hidden relative shadow-[0_0_15px_rgba(0,212,255,0.4)] bg-black/50 group-hover:shadow-[0_0_25px_rgba(0,212,255,0.8)] transition-all duration-500 flex items-center justify-center">
-                      <div className="absolute inset-0 bg-primary/20 mix-blend-overlay z-10 pointer-events-none" />
-                      <img src="/char.jpeg" alt="CHANI AI" className="w-[120%] h-[120%] object-cover object-center scale-90 rounded-full" />
-                      <div className="absolute inset-0 w-full h-[30%] bg-primary/30 opacity-40 pointer-events-none animate-hologram-scan z-20" />
+                  
+                  {/* === CHANI SCI-FI FRAME DENGAN IMAGE === */}
+                  <div className="relative w-20 h-20 md:w-24 md:h-24 border border-cyan-500/50 shadow-[0_0_20px_rgba(34,211,238,0.2)] bg-black p-1 group/frame shrink-0 my-1">
+                    {/* Siku-siku sci-fi di setiap sudut */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-pink-500"></div>
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-pink-500"></div>
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-pink-500"></div>
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-pink-500"></div>
+                    
+                    <div className="relative w-full h-full overflow-hidden border border-cyan-900/50">
+                      <Image 
+                        src="/char.jpeg" 
+                        alt="CHANI AI" 
+                        fill
+                        className="object-cover opacity-80 group-hover/frame:opacity-100 transition-opacity duration-300 filter contrast-125 grayscale-[10%]"
+                      />
+                      {/* Inner Scanline Overlay khusus untuk foto CHANI */}
+                      <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.05)_2px,transparent_2px)] bg-[size:100%_4px] pointer-events-none z-10"></div>
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-[3px] border-surface shadow-[0_0_8px_rgba(16,185,129,0.8)] z-30" />
+                    
+                    {/* Label Hologram */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-black border border-pink-500/50 px-2 py-0.5 text-[8px] text-pink-400 font-mono tracking-widest whitespace-nowrap shadow-[0_0_10px_rgba(236,72,153,0.5)] z-20">
+                      UNIT: CHANI
+                    </div>
                   </div>
+                  {/* ======================================= */}
 
                   <div>
-                    <h3 className="text-primary font-bold text-sm tracking-widest text-glow flex items-center gap-2">
+                    <h3 className="text-pink-400 font-bold text-sm tracking-widest drop-shadow-[0_0_8px_rgba(236,72,153,0.8)] flex items-center gap-2">
                       AGENT_CHANI
-                      <span className="text-[8px] bg-primary/20 text-primary border border-primary/30 px-1.5 py-0.5 rounded font-mono">AI v2.1</span>
+                      <span className="text-[8px] bg-pink-500/20 text-pink-300 border border-pink-500/50 px-1.5 py-0.5 rounded font-mono">AI v2.1</span>
                     </h3>
-                    <p className="text-[9px] text-primary/50 tracking-[0.2em] font-mono uppercase mt-0.5">
+                    <p className="text-[9px] text-cyan-600 tracking-[0.2em] font-mono uppercase mt-0.5">
                       GLOBAL_RADAR_NODE // ACTIVE
                     </p>
                   </div>
                </div>
 
                <div className="hidden md:flex flex-col items-end gap-1 relative z-10 shrink-0">
-                 <p className="text-[9px] font-mono text-primary/40 tracking-[0.2em] uppercase">SELECTED_NODE</p>
-                 <p className="text-sm font-bold font-mono text-primary text-glow tracking-widest">{selectedCity.toUpperCase()}</p>
-                 <p className="text-[8px] font-mono text-primary/30 tracking-widest">{activeTab === 'temperature' ? 'MODE: TEMP_ANALYSIS' : 'MODE: EVENT_WATCH'}</p>
+                 <p className="text-[9px] font-mono text-cyan-800 tracking-[0.2em] uppercase">SELECTED_NODE</p>
+                 <p className="text-sm font-bold font-mono text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)] tracking-widest">{selectedCity.toUpperCase()}</p>
+                 <p className="text-[8px] font-mono text-pink-500/70 tracking-widest">{activeTab === 'temperature' ? 'MODE: TEMP_ANALYSIS' : 'MODE: EVENT_WATCH'}</p>
                </div>
             </div>
 
             {/* COMBOBOX SEARCH */}
             <div className="relative z-50 shrink-0" ref={dropdownRef}>
               <div className="relative">
-                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 w-5 h-5" />
+                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-600 w-5 h-5" />
                 <input 
                   type="text" 
                   value={searchInput} 
@@ -234,21 +254,21 @@ export default function DashboardTerminal() {
                     setIsDropdownOpen(true);
                   }}
                   onFocus={() => setIsDropdownOpen(true)}
-                  className="w-full bg-surface/80 backdrop-blur-md border border-primary/40 text-white placeholder:text-primary/30 focus:outline-none focus:border-primary focus:shadow-[0_0_20px_rgba(0,212,255,0.4)] py-3 pl-12 pr-12 transition-all uppercase tracking-widest font-mono text-sm rounded-xl"
+                  className="w-full bg-black/80 backdrop-blur-md border border-cyan-900/60 text-cyan-100 placeholder:text-cyan-800 focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(34,211,238,0.3)] py-3 pl-12 pr-12 transition-all uppercase tracking-widest font-mono text-sm rounded-xl"
                   placeholder="ADD CITY TO WATCHLIST..."
                 />
-                <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 text-primary/60 w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 text-cyan-600 w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </div>
               
               {isDropdownOpen && (
-                <div className="absolute top-full left-0 w-full mt-2 bg-surface/95 backdrop-blur-xl border border-primary/40 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                <div className="absolute top-full left-0 w-full mt-2 bg-black/95 backdrop-blur-xl border border-cyan-900/60 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
                   {suggestions.map((city, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSelectCity(city)}
-                      className="w-full text-left px-5 py-3 hover:bg-primary/20 text-white font-mono uppercase tracking-widest text-sm border-b border-primary/10 last:border-0 transition-colors flex items-center gap-3"
+                      className="w-full text-left px-5 py-3 hover:bg-cyan-900/40 text-cyan-100 font-mono uppercase tracking-widest text-sm border-b border-cyan-900/30 last:border-0 transition-colors flex items-center gap-3"
                     >
-                      <Search className="w-4 h-4 text-primary/50" /> {city}
+                      <Search className="w-4 h-4 text-pink-500/50" /> {city}
                     </button>
                   ))}
                 </div>
@@ -257,13 +277,13 @@ export default function DashboardTerminal() {
 
             {/* 7-DAY FORECAST WATCHLIST */}
             <div className="flex flex-col gap-3 pb-6">
-              <h2 className="text-[10px] font-mono text-primary/50 tracking-[0.3em] uppercase pl-1">
+              <h2 className="text-[10px] font-mono text-cyan-700 tracking-[0.3em] uppercase pl-1">
                 // WATCHLIST_NEXUS
               </h2>
               
               {isLoadingWeather && Object.keys(weatherMap).length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-primary/50 flex-col gap-3 font-mono border border-dashed border-primary/20 rounded-xl bg-surface/30 p-12">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+                <div className="flex-1 flex items-center justify-center text-cyan-600 flex-col gap-3 font-mono border border-dashed border-cyan-900/50 rounded-xl bg-black/40 p-12">
+                  <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mb-2"></div>
                   <p className="tracking-widest">SCANNING_ATMOSPHERE...</p>
                 </div>
               ) : (
@@ -276,18 +296,18 @@ export default function DashboardTerminal() {
                       <div 
                         key="GLOBAL"
                         onClick={() => setSelectedCity('GLOBAL')}
-                        className={`p-4 rounded-xl border transition-all cursor-pointer group relative overflow-hidden mb-2 ${isSelected ? 'bg-primary/20 border-primary shadow-[0_0_20px_rgba(0,212,255,0.2)]' : 'bg-surface/40 border-primary/20 hover:border-primary/50'}`}
+                        className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden mb-2 ${isSelected ? 'bg-cyan-950/40 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.2)]' : 'bg-black/60 border-cyan-900/40 hover:border-pink-500/50'}`}
                       >
-                        {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary shadow-[0_0_10px_rgba(0,212,255,0.8)]" />}
+                        {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />}
                         <div className="flex items-center gap-4 pl-2">
-                          <div className="p-3 bg-primary/10 rounded-full border border-primary/30 group-hover:bg-primary/20 transition-colors">
-                            <Globe className={`w-8 h-8 ${isSelected ? 'text-primary' : 'text-primary/70'}`} />
+                          <div className={`p-3 rounded-full border transition-colors ${isSelected ? 'bg-cyan-500/20 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-black/50 border-cyan-900/50 group-hover:border-pink-500/50 group-hover:bg-pink-500/10'}`}>
+                            <Globe className={`w-8 h-8 ${isSelected ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-cyan-700'}`} />
                           </div>
                           <div>
-                            <h3 className={`text-lg font-bold tracking-widest uppercase ${isSelected ? 'text-primary text-glow' : 'text-white'}`}>
+                            <h3 className={`text-lg font-bold tracking-widest uppercase ${isSelected ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-cyan-100'}`}>
                               GLOBAL_RADAR
                             </h3>
-                            <p className="text-[10px] text-primary/60 font-mono tracking-widest uppercase mt-1">SHOW ALL WORLDWIDE MARKETS</p>
+                            <p className="text-[10px] text-pink-500/70 font-mono tracking-widest uppercase mt-1">SHOW ALL WORLDWIDE MARKETS</p>
                           </div>
                         </div>
                       </div>
@@ -302,29 +322,29 @@ export default function DashboardTerminal() {
                     <div 
                       key={city}
                       onClick={() => setSelectedCity(city)}
-                      className={`p-4 rounded-xl border transition-all cursor-pointer group relative overflow-hidden ${isSelected ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(0,212,255,0.15)]' : 'bg-surface/40 border-primary/20 hover:border-primary/50'}`}
+                      className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden ${isSelected ? 'bg-cyan-950/20 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.15)]' : 'bg-black/60 border-cyan-900/40 hover:border-cyan-500/50'}`}
                     >
-                      {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary shadow-[0_0_10px_rgba(0,212,255,0.8)]" />}
+                      {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />}
                       
                       <div className="flex justify-between items-start mb-4 pl-2">
                         <div>
-                          <h3 className={`text-lg font-bold tracking-widest uppercase flex items-center gap-2 ${isSelected ? 'text-primary text-glow' : 'text-white'}`}>
+                          <h3 className={`text-lg font-bold tracking-widest uppercase flex items-center gap-2 ${isSelected ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-cyan-100'}`}>
                             {data.city}
                           </h3>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-2xl font-bold tracking-tighter text-white">{data.temp}°</span>
-                            <span className="text-[10px] text-primary/60 font-mono tracking-widest uppercase">{data.description}</span>
+                            <span className="text-[10px] text-pink-400/80 font-mono tracking-widest uppercase">{data.description}</span>
                           </div>
                         </div>
 
                         <div className="flex flex-col items-end gap-1">
                           {data.signals.stormRisk !== 'low' && (
-                            <span className="px-2 py-0.5 text-[8px] font-bold text-red-400 bg-red-500/20 border border-red-500/50 rounded animate-pulse font-mono tracking-widest">
+                            <span className="px-2 py-0.5 text-[8px] font-bold text-pink-400 bg-pink-500/20 border border-pink-500/50 rounded animate-pulse font-mono tracking-widest">
                               ⚠ STORM_RISK
                             </span>
                           )}
                           {(data.precipitationProb ?? 0) > 40 && (
-                            <span className="px-2 py-0.5 text-[8px] font-bold text-indigo-400 bg-indigo-500/20 border border-indigo-500/50 rounded font-mono flex items-center gap-1">
+                            <span className="px-2 py-0.5 text-[8px] font-bold text-cyan-400 bg-cyan-500/20 border border-cyan-500/50 rounded font-mono flex items-center gap-1">
                               <Droplets className="w-2 h-2" /> {data.precipitationProb}%
                             </span>
                           )}
@@ -333,17 +353,17 @@ export default function DashboardTerminal() {
 
                       <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-2 pl-2">
                         {data.daily.map((d, i) => (
-                          <div key={i} className={`flex flex-col items-center p-2 rounded-lg min-w-[55px] shrink-0 border transition-colors ${i === 0 ? 'bg-primary/20 border-primary/40' : 'bg-black/40 border-primary/10 group-hover:border-primary/30'}`}>
-                            <span className={`text-[9px] font-mono tracking-wider ${i === 0 ? 'text-primary font-bold' : 'text-primary/70'}`}>
+                          <div key={i} className={`flex flex-col items-center p-2 rounded-lg min-w-[55px] shrink-0 border transition-colors ${i === 0 ? 'bg-cyan-500/10 border-cyan-500/50 shadow-[0_0_10px_rgba(34,211,238,0.1)]' : 'bg-black/50 border-cyan-900/30 group-hover:border-cyan-700/50'}`}>
+                            <span className={`text-[9px] font-mono tracking-wider ${i === 0 ? 'text-cyan-400 font-bold drop-shadow-[0_0_2px_rgba(34,211,238,0.8)]' : 'text-cyan-700'}`}>
                               {i === 0 ? 'TODAY' : d.date.split(',')[0].toUpperCase()}
                             </span>
-                            <WeatherIcon code={d.weatherCode} className={`w-6 h-6 my-2 ${i === 0 ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-primary/80'}`} />
+                            <WeatherIcon code={d.weatherCode} className={`w-6 h-6 my-2 ${i === 0 ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'text-cyan-600'}`} />
                             <div className="flex items-center gap-1.5 w-full justify-center">
-                              <span className="text-[10px] font-bold text-blue-400">{d.minTemp}°</span>
-                              <span className="text-[10px] font-bold text-orange-400">{d.maxTemp}°</span>
+                              <span className="text-[10px] font-bold text-cyan-400">{d.minTemp}°</span>
+                              <span className="text-[10px] font-bold text-pink-400">{d.maxTemp}°</span>
                             </div>
                             {activeTab === 'events' && d.precipProb > 20 && (
-                               <div className="mt-1.5 text-[8px] text-indigo-400 font-mono tracking-tighter flex items-center gap-0.5 bg-indigo-500/10 px-1 rounded">
+                               <div className="mt-1.5 text-[8px] text-cyan-300 font-mono tracking-tighter flex items-center gap-0.5 bg-cyan-500/20 px-1 rounded">
                                  <Droplets className="w-2 h-2" /> {d.precipProb}%
                                </div>
                             )}
@@ -358,25 +378,25 @@ export default function DashboardTerminal() {
           </section>
 
           {/* RIGHT PANEL: POLYMARKET UI */}
-          <section className="w-full lg:w-[500px] bg-surface/80 backdrop-blur-xl p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.4)] border-l border-primary/30">
-            <div className="flex items-center justify-between pb-4 border-b border-primary/30 shrink-0">
+          <section className="w-full lg:w-[500px] bg-black/60 backdrop-blur-xl p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] border-l border-cyan-900/50">
+            <div className="flex items-center justify-between pb-4 border-b border-cyan-900/50 shrink-0">
               <h2 className="text-sm font-bold text-white flex items-center gap-2 tracking-widest uppercase">
-                <TrendingUp className={`w-5 h-5 ${activeTab === 'events' ? 'text-red-400' : 'text-primary'}`} />
+                <TrendingUp className={`w-5 h-5 ${activeTab === 'events' ? 'text-pink-400 drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
                 {selectedCity === 'GLOBAL' ? 'ALL_WORLDWIDE_MARKETS' : `${selectedCity.split(',')[0]}_MARKETS`}
               </h2>
-              {isLoadingMarkets && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>}
+              {isLoadingMarkets && <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin shadow-[0_0_10px_rgba(236,72,153,0.5)]"></div>}
             </div>
 
             <div className="space-y-4 pb-6">
               {!isLoadingMarkets && markets.length === 0 ? (
-                 <div className="text-center py-12 px-6 text-primary/40 border border-dashed border-primary/20 font-mono text-xs tracking-widest rounded-xl bg-black/20 flex flex-col items-center gap-4">
+                 <div className="text-center py-12 px-6 text-cyan-700 border border-dashed border-cyan-900/50 font-mono text-xs tracking-widest rounded-xl bg-black/40 flex flex-col items-center gap-4">
                    <span>NO_ACTIVE_{activeTab === 'events' ? 'WEATHER' : 'TEMP'}_MARKETS_FOUND<br/>FOR_{selectedCity.toUpperCase()}</span>
                    
                    {/* Tombol Cerdas: Balik ke Global View jika kota kosong */}
                    {selectedCity !== 'GLOBAL' && (
                      <button 
                        onClick={() => setSelectedCity('GLOBAL')}
-                       className="px-6 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/40 rounded transition-all text-[10px] flex items-center gap-2 hover:shadow-[0_0_15px_rgba(0,212,255,0.3)]"
+                       className="px-6 py-2.5 bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-400 border border-cyan-700/50 rounded transition-all text-[10px] flex items-center gap-2 hover:shadow-[0_0_15px_rgba(34,211,238,0.3)]"
                      >
                        <Globe className="w-4 h-4" /> SWITCH TO GLOBAL VIEW
                      </button>
@@ -384,35 +404,35 @@ export default function DashboardTerminal() {
                  </div>
               ) : (
                 markets.map((market) => (
-                  <div key={market.id} className="bg-black/60 border border-primary/20 hover:border-primary/60 transition-colors shadow-[0_0_15px_rgba(0,212,255,0.05)] rounded-xl overflow-hidden group">
+                  <div key={market.id} className="bg-black/80 border border-cyan-900/40 hover:border-pink-500/50 transition-colors duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-xl overflow-hidden group">
                     <div className="flex items-start p-4 gap-4">
-                      <div className="w-16 h-16 shrink-0 rounded-lg bg-surface border border-primary/30 overflow-hidden flex items-center justify-center relative">
+                      <div className="w-16 h-16 shrink-0 rounded-lg bg-black border border-cyan-900/60 overflow-hidden flex items-center justify-center relative">
                         {market.image ? (
-                          <img src={market.image} alt="market icon" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                          <img src={market.image} alt="market icon" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 filter contrast-125 grayscale-[20%]" />
                         ) : (
-                          <TrendingUp className="w-6 h-6 text-primary/30" />
+                          <TrendingUp className="w-6 h-6 text-cyan-700" />
                         )}
-                        <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
+                        <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay"></div>
                       </div>
                       
                       <div className="flex-1">
-                        <h3 className="font-bold text-white text-[13px] leading-snug mb-2 font-sans">{market.title}</h3>
+                        <h3 className="font-bold text-cyan-50 text-[13px] leading-snug mb-2 font-sans group-hover:text-cyan-300 transition-colors">{market.title}</h3>
                         <div className="flex items-center gap-3 text-[9px] font-mono tracking-widest">
-                          <span className="text-primary/80">VOL: ${(market.volume / 1000).toFixed(1)}K</span>
-                          <span className="text-primary/40">•</span>
-                          <span className="text-primary/80">EXP: {market.endDate}</span>
+                          <span className="text-cyan-500">VOL: ${(market.volume / 1000).toFixed(1)}K</span>
+                          <span className="text-cyan-900">•</span>
+                          <span className="text-pink-500/80">EXP: {market.endDate}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-px bg-primary/20 border-t border-primary/20">
-                      <button className="flex justify-between items-center px-5 py-3 bg-surface/80 hover:bg-primary/20 transition-all">
-                        <span className="font-bold text-cyan-400 uppercase tracking-widest text-xs text-glow">Yes</span>
-                        <span className="font-mono text-white font-bold">{market.outcomePrices[0] || 0}¢</span>
+                    <div className="grid grid-cols-2 gap-px bg-cyan-900/40 border-t border-cyan-900/40">
+                      <button className="flex justify-between items-center px-5 py-3 bg-black hover:bg-cyan-900/30 transition-all">
+                        <span className="font-bold text-cyan-400 uppercase tracking-widest text-xs drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">Yes</span>
+                        <span className="font-mono text-cyan-100 font-bold">{market.outcomePrices[0] || 0}¢</span>
                       </button>
-                      <button className="flex justify-between items-center px-5 py-3 bg-surface/80 hover:bg-red-500/20 transition-all">
-                        <span className="font-bold text-red-400 uppercase tracking-widest text-xs">No</span>
-                        <span className="font-mono text-white font-bold">{market.outcomePrices[1] || 0}¢</span>
+                      <button className="flex justify-between items-center px-5 py-3 bg-black hover:bg-pink-900/30 transition-all">
+                        <span className="font-bold text-pink-400 uppercase tracking-widest text-xs drop-shadow-[0_0_5px_rgba(236,72,153,0.8)]">No</span>
+                        <span className="font-mono text-pink-100 font-bold">{market.outcomePrices[1] || 0}¢</span>
                       </button>
                     </div>
                   </div>
@@ -422,6 +442,10 @@ export default function DashboardTerminal() {
           </section>
         </main>
       </div>
+
+      {/* === GLOBAL CRT SCANLINE OVERLAY === */}
+      {/* Bersifat pointer-events-none agar tombol tetap bisa diklik bebas hambatan */}
+      <div className="pointer-events-none fixed inset-0 z-[100] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.15)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_4px,3px_100%] opacity-30 mix-blend-overlay"></div>
     </div>
   );
 }
