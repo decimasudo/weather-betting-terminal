@@ -11,7 +11,7 @@ const shareTechMono = Share_Tech_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CHANI.Agent",
+  title: "Chani Agent",
   description: "Climate Intelligence AI - Weather Betting Terminal",
   icons: {
     icon: "/char.jpeg",

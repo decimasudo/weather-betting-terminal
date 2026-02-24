@@ -14,9 +14,12 @@ Twitter: https://x.com/chaniagent
 
 ## 📡 The Transmission
 
-WEATHER BETTING TERMINAL is a high-frequency interface designed for the intersection of climate data and predictive markets. It aggregates global weather telemetry into actionable betting opportunities through real-time satellite analysis and AI-driven probability modeling.
+CLIMATE INTELLIGENCE AGENT is an autonomous AI system built for the intersection of atmospheric science and predictive markets.
 
-We don't just track weather. We quantify atmospheric uncertainty and map the psychological matrix of climate markets through proprietary simulation engines and sentiment analysis.
+It transforms global climate telemetry into actionable probability signals through real-time satellite monitoring, anomaly detection, and advanced AI modeling.
+
+We don’t just track weather.
+We quantify atmospheric uncertainty — modeling volatility, detecting regime shifts, and mapping the structural dynamics of climate-driven markets through proprietary simulation engines and behavioral signal analysis.
 
 ---
 

@@ -126,7 +126,7 @@ export default function LandingPage() {
             </h1>
             
             <p className="text-sm md:text-lg text-cyan-100/70 mb-12 max-w-2xl mx-auto leading-relaxed font-mono">
-              Advanced weather analysis terminal. Directly integrated with <span className="text-white font-bold border-b border-pink-500">Polymarket</span>. Real-time satellite data analysis and position execution assisted by CHANI AI Agent.
+              Autonomous Climate Intelligence Agent. Directly integrated with <span className="text-white font-bold border-b border-pink-500">Polymarket</span>. Real-time satellite data analysis and position execution assisted by CHANI AI Agent.
             </p>
 
             <div className="flex justify-center gap-6">
@@ -135,7 +135,7 @@ export default function LandingPage() {
                 <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-pink-500"></div>
                 <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-pink-500"></div>
                 
-                Access Terminal 
+                Access Agent 
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
