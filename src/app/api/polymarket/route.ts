@@ -127,6 +127,7 @@ export async function GET(request: Request) {
       return {
         id: event.id,
         title: event.title,
+        slug: event.slug, // <--- BUG FIX: Menambahkan Slug agar URL Polymarket valid
         volume: event.volume || 0,
         endDate: new Date(event.endDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
         outcomePrices: prices.map((p: any) => Math.round(Number(p) * 100)),
