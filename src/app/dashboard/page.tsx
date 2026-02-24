@@ -8,7 +8,7 @@ import {
   TrendingUp, ArrowRight, Sun, Cloud, 
   CloudRain, CloudLightning, CloudSnow, CloudFog, Cpu,
   ThermometerSun, AlertTriangle, ChevronDown, MapPin, Globe,
-  MessageSquare, X, Send, ExternalLink, Loader2
+  MessageSquare, X, Send, ExternalLink, Loader2, Activity
 } from 'lucide-react';
 import { fetchWeather, fetchCitySuggestions, WeatherData } from '@/lib/api';
 import { InteractiveBackground } from '@/components/interactive-background';
@@ -191,12 +191,19 @@ export default function DashboardTerminal() {
   };
 
   return (
-    <div className="min-h-screen font-share-tech flex flex-col h-screen overflow-hidden selection:bg-pink-500/30 relative text-foreground bg-black">
-      <InteractiveBackground />
+    <div className="min-h-screen font-share-tech flex flex-col h-screen overflow-hidden selection:bg-pink-500/30 relative text-foreground bg-[#0a0a0a]">
+      
+      {/* === INTERACTIVE BACKGROUND === */}
+      {/* Ditempatkan dengan z-0 agar berada di belakang panel yang semi-transparan */}
+      <div className="absolute inset-0 z-0">
+        <InteractiveBackground />
+      </div>
 
-      <div className="relative z-10 flex flex-col h-full">
+      {/* Main Content Overlay dengan sedikit transparansi untuk menampilkan background */}
+      <div className="relative z-10 flex flex-col h-full bg-black/60">
+        
         {/* NAVBAR */}
-        <nav className="h-16 border-b border-cyan-900/60 bg-black/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 shadow-[0_4px_20px_rgba(34,211,238,0.1)]">
+        <nav className="h-16 border-b border-cyan-900/60 bg-black/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 shadow-[0_4px_20px_rgba(34,211,238,0.1)]">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-cyan-600 hover:text-pink-400 transition-colors p-2 rounded-lg hover:bg-pink-500/10">
               <ArrowRight className="w-5 h-5 rotate-180" />
@@ -226,7 +233,7 @@ export default function DashboardTerminal() {
         <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
           
           {/* LEFT PANEL: GLOBAL WATCHLIST */}
-          <section className="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative z-10 border-r border-cyan-900/50 bg-black/40 backdrop-blur-sm">
+          <section className="flex-1 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 relative border-r border-cyan-900/50 bg-black/40 backdrop-blur-sm">
             
             {/* AGENT IDENTITY WIDGET */}
             <div className="flex items-center justify-between p-4 border border-cyan-900/60 bg-black/80 rounded-xl relative overflow-hidden group shrink-0 shadow-[0_0_30px_rgba(34,211,238,0.05)]">
@@ -263,8 +270,8 @@ export default function DashboardTerminal() {
             </div>
 
             {/* COMBOBOX SEARCH */}
-            <div className="relative z-50 shrink-0" ref={dropdownRef}>
-              <div className="relative">
+            <div className="relative shrink-0" ref={dropdownRef}>
+              <div className="relative z-50">
                 <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-600 w-5 h-5" />
                 <input 
                   type="text" 
@@ -278,7 +285,7 @@ export default function DashboardTerminal() {
               </div>
               
               {isDropdownOpen && (
-                <div className="absolute top-full left-0 w-full mt-2 bg-black/95 backdrop-blur-xl border border-cyan-900/60 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                <div className="absolute top-full left-0 w-full mt-2 bg-black/95 backdrop-blur-xl border border-cyan-900/60 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar z-50">
                   {suggestions.map((city, idx) => (
                     <button key={idx} onClick={() => handleSelectCity(city)} className="w-full text-left px-5 py-3 hover:bg-cyan-900/40 text-cyan-100 font-mono uppercase tracking-widest text-sm border-b border-cyan-900/30 last:border-0 transition-colors flex items-center gap-3">
                       <Search className="w-4 h-4 text-pink-500/50" /> {city}
@@ -288,20 +295,28 @@ export default function DashboardTerminal() {
               )}
             </div>
 
-            {/* WATCHLIST */}
-            <div className="flex flex-col gap-3 pb-6">
-              <h2 className="text-[10px] font-mono text-cyan-700 tracking-[0.3em] uppercase pl-1">// WATCHLIST_NEXUS</h2>
+            {/* === WATCHLIST NEXUS === */}
+            <div className="flex flex-col gap-4 pb-6">
+              <div className="flex items-center gap-2 pl-1 border-b border-cyan-900/30 pb-2">
+                 <Activity className="w-4 h-4 text-pink-500 animate-pulse" />
+                 <h2 className="text-[10px] font-mono text-cyan-400 tracking-[0.3em] uppercase">
+                   // WATCHLIST_NEXUS
+                 </h2>
+              </div>
+              
               {isLoadingWeather && Object.keys(weatherMap).length === 0 ? (
                 <div className="flex-1 flex items-center justify-center text-cyan-600 flex-col gap-3 font-mono border border-dashed border-cyan-900/50 rounded-xl bg-black/40 p-12">
-                  <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                  <p className="tracking-widest">SCANNING_ATMOSPHERE...</p>
+                  <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mb-2 shadow-[0_0_10px_rgba(236,72,153,0.5)]"></div>
+                  <p className="tracking-widest animate-pulse">SCANNING_ATMOSPHERE...</p>
                 </div>
               ) : (
                 watchlist.map((city) => {
                   const isSelected = selectedCity === city;
+
+                  // === KARTU: GLOBAL VIEW ===
                   if (city === 'GLOBAL') {
                     return (
-                      <div key="GLOBAL" onClick={() => setSelectedCity('GLOBAL')} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden mb-2 ${isSelected ? 'bg-cyan-950/40 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.2)]' : 'bg-black/60 border-cyan-900/40 hover:border-pink-500/50'}`}>
+                      <div key="GLOBAL" onClick={() => setSelectedCity('GLOBAL')} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden mb-2 ${isSelected ? 'bg-gradient-to-r from-cyan-900/40 to-black border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.2)]' : 'bg-black/60 border-cyan-900/40 hover:border-pink-500/50'}`}>
                         {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />}
                         <div className="flex items-center gap-4 pl-2">
                           <div className={`p-3 rounded-full border transition-colors ${isSelected ? 'bg-cyan-500/20 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'bg-black/50 border-cyan-900/50 group-hover:border-pink-500/50 group-hover:bg-pink-500/10'}`}>
@@ -315,20 +330,80 @@ export default function DashboardTerminal() {
                       </div>
                     );
                   }
+
                   const data = weatherMap[city];
                   if (!data) return null;
+
+                  // === KARTU: CITY FORECAST ===
                   return (
-                    <div key={city} onClick={() => setSelectedCity(city)} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden ${isSelected ? 'bg-cyan-950/20 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.15)]' : 'bg-black/60 border-cyan-900/40 hover:border-cyan-500/50'}`}>
-                      {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />}
-                      <div className="flex justify-between items-start mb-4 pl-2">
+                    <div key={city} onClick={() => setSelectedCity(city)} className={`p-5 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden ${isSelected ? 'bg-gradient-to-br from-cyan-950/30 to-black border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.15)]' : 'bg-black/80 border-cyan-900/50 hover:border-cyan-500/50 hover:bg-cyan-950/10'}`}>
+                      {/* Efek Garis Aktif */}
+                      {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,1)]" />}
+                      
+                      {/* Header Kartu: Info Utama */}
+                      <div className="flex justify-between items-start mb-5 pl-2">
                         <div>
-                          <h3 className={`text-lg font-bold tracking-widest uppercase flex items-center gap-2 ${isSelected ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-cyan-100'}`}>{data.city}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-2xl font-bold tracking-tighter text-white">{data.temp}°</span>
-                            <span className="text-[10px] text-pink-400/80 font-mono tracking-widest uppercase">{data.description}</span>
+                          <h3 className={`text-xl font-bold tracking-widest uppercase flex items-center gap-2 ${isSelected ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-cyan-100'}`}>
+                            {data.city}
+                          </h3>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="text-3xl font-bold tracking-tighter text-white drop-shadow-md">{data.temp}°</span>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-pink-400/90 font-mono tracking-widest uppercase">{data.description}</span>
+                              <span className="text-[9px] text-cyan-600 font-mono uppercase">CURRENT_STATUS</span>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Indikator Risiko Anomali */}
+                        <div className="flex flex-col items-end gap-1.5">
+                          {data.signals.stormRisk !== 'low' && (
+                            <span className="px-2 py-0.5 text-[8px] font-bold text-black bg-pink-500 border border-pink-400 rounded animate-pulse font-mono tracking-widest shadow-[0_0_10px_rgba(236,72,153,0.8)]">
+                              ⚠ STORM_RISK
+                            </span>
+                          )}
+                          {(data.precipitationProb ?? 0) > 30 && (
+                            <span className="px-2 py-0.5 text-[9px] font-bold text-cyan-200 bg-cyan-900/50 border border-cyan-500/50 rounded font-mono flex items-center gap-1 shadow-[0_0_5px_rgba(34,211,238,0.3)]">
+                              <Droplets className="w-2.5 h-2.5 text-cyan-400" /> {data.precipitationProb}% PRECIP
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* 7-DAY FORECAST GRID */}
+                      <div className="mt-2 pt-4 border-t border-cyan-900/40">
+                        <p className="text-[9px] font-mono text-cyan-700 tracking-widest mb-3 pl-2 uppercase">7-DAY_PROJECTION_MATRIX</p>
+                        <div className="flex gap-2.5 overflow-x-auto custom-scrollbar pb-2 pl-2 pr-2">
+                          {data.daily.map((d, i) => {
+                            const isToday = i === 0;
+                            return (
+                              <div key={i} className={`flex flex-col items-center p-3 rounded-lg min-w-[70px] shrink-0 border transition-all duration-300 ${isToday ? 'bg-pink-950/20 border-pink-500/60 shadow-[0_0_15px_rgba(236,72,153,0.15)] relative overflow-hidden' : 'bg-black/60 border-cyan-900/40 group-hover:border-cyan-700/60 hover:bg-cyan-900/20 hover:scale-105'}`}>
+                                
+                                {/* Background glow for TODAY */}
+                                {isToday && <div className="absolute inset-0 bg-gradient-to-t from-pink-500/10 to-transparent pointer-events-none" />}
+                                
+                                <span className={`text-[10px] font-mono tracking-wider z-10 ${isToday ? 'text-pink-400 font-bold drop-shadow-[0_0_2px_rgba(236,72,153,0.8)]' : 'text-cyan-600'}`}>
+                                  {isToday ? 'TODAY' : d.date.split(',')[0].toUpperCase()}
+                                </span>
+                                
+                                <WeatherIcon code={d.weatherCode} className={`w-7 h-7 my-2.5 z-10 ${isToday ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-cyan-500'}`} />
+                                
+                                <div className="flex items-center justify-between w-full z-10 px-1">
+                                  <span className="text-[11px] font-bold text-cyan-400 text-shadow-sm">{d.minTemp}°</span>
+                                  <span className="text-[11px] font-bold text-pink-400 text-shadow-sm">{d.maxTemp}°</span>
+                                </div>
+                                
+                                {activeTab === 'events' && d.precipProb > 20 && (
+                                   <div className="mt-2 text-[9px] text-cyan-200 font-mono tracking-tighter flex items-center gap-1 bg-cyan-900/40 border border-cyan-500/30 px-1.5 py-0.5 rounded shadow-[0_0_5px_rgba(34,211,238,0.2)] z-10">
+                                     <Droplets className="w-2.5 h-2.5" /> {d.precipProb}%
+                                   </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
                     </div>
                   );
                 })
@@ -360,7 +435,7 @@ export default function DashboardTerminal() {
                 markets.map((market) => (
                   <div key={market.id} className="bg-black/80 border border-cyan-900/40 hover:border-pink-500/80 transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] rounded-xl overflow-hidden group relative flex flex-col">
                     
-                    {/* === ICON CHAT KHUSUS (MENGHINDARI REDIRECT KETIKA DIKLIK) === */}
+                    {/* === ICON CHAT KHUSUS === */}
                     <button 
                       onClick={(e) => {
                         e.preventDefault();
@@ -373,7 +448,7 @@ export default function DashboardTerminal() {
                       <MessageSquare className="w-4 h-4" />
                     </button>
 
-                    {/* === BUNGKUSAN CARD UTAMA (LINK LANGSUNG KE POLYMARKET) === */}
+                    {/* === BUNGKUSAN CARD UTAMA === */}
                     <a 
                       href={`https://polymarket.com/event/${market.slug || ''}`} 
                       target="_blank" 
@@ -390,7 +465,7 @@ export default function DashboardTerminal() {
                           <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay"></div>
                         </div>
                         
-                        <div className="flex-1 pr-10"> {/* pr-10 agar teks tidak menabrak tombol chat */}
+                        <div className="flex-1 pr-10">
                           <h3 className="font-bold text-cyan-50 text-[13px] leading-snug mb-2 font-sans group-hover:text-cyan-300 transition-colors line-clamp-2">{market.title}</h3>
                           <div className="flex items-center gap-3 text-[9px] font-mono tracking-widest">
                             <span className="text-cyan-500">VOL: ${(market.volume / 1000).toFixed(1)}K</span>
