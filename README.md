@@ -8,7 +8,7 @@
 
 Official Terminal: www.weath3rbet.site/
 
-CA: [Contract Address Here]
+CA: 
 
 Twitter: https://x.com/chaniagent
 
