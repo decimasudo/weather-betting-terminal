@@ -6,7 +6,7 @@
 [![Core](https://img.shields.io/badge/CHANI_Engine-ONLINE-red?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-Official Terminal: www.weath3rbet.site/
+Official Terminal: https://www.chaniagent.site/
 
 CA: 
 
