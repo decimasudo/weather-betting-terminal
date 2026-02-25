@@ -8,7 +8,7 @@
 
 Official Terminal: https://www.chaniagent.site/
 
-CA: 
+CA: dmhiJL3w2HsPgjZDVFV7yGT7EgHjuzcrgVPZ7J8pump
 
 Twitter: https://x.com/chaniagent
 
